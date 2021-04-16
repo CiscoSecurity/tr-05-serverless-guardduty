@@ -21,8 +21,8 @@ class Observable(metaclass=ABCMeta):
         """Returns the observable type."""
 
     @abstractmethod
-    def query(self, observable: str) -> str:
-        """Returns a tuple of (sourcetype, condition)."""
+    def query(self, observable: str) -> dict:
+        """Returns criterion."""
 
 
 class IP(Observable):

@@ -12,7 +12,7 @@ def health():
     _ = get_jwt()
     guard_duty = GuardDutyDriver()
     observable = Observable.of(type_='ip')
-    condition = observable.query(observable='1.1.1.1')
-    guard_duty.findings.list(condition)
+    criterion = observable.query(observable='1.1.1.1')
+    guard_duty.findings.list(criterion)
 
     return jsonify_data({'status': 'ok'})
