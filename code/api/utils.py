@@ -93,6 +93,7 @@ def get_jwt():
         jwks_host = jwt.decode(
             token, options={'verify_signature': False}
         ).get('jwks_host')
+        assert jwks_host
         key = get_public_key(jwks_host, token)
         aud = request.url_root
         payload = jwt.decode(
@@ -101,6 +102,7 @@ def get_jwt():
 
         set_environment_variable(payload, 'AWS_REGION')
         set_environment_variable(payload, 'AWS_ACCESS_KEY_ID')
+        set_environment_variable(payload, 'CTR_ENTITIES_LIMIT')
         set_environment_variable(payload, 'AWS_SECRET_ACCESS_KEY')
         set_environment_variable(payload, 'AWS_GUARD_DUTY_DETECTOR_ID')
 

@@ -50,13 +50,18 @@ class GuardDutyDriver(object):
         def __init__(self, root):
             self.driver = root.driver
             self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
+            try:
+                self.max_results = int(current_app.config['CTR_ENTITIES_LIMIT'])
+                assert self.max_results
+            except (ValueError, AssertionError):
+                self.max_results = current_app.config['DEFAULT_CTR_ENTITIES_LIMIT']
 
-        def list(self, criterion, max_results=20, next_token=''):
+        def list(self, criterion, next_token=''):
             try:
                 response = self.driver.list_findings(
                     DetectorId=self.detector,
                     FindingCriteria=criterion,
-                    MaxResults=max_results,
+                    MaxResults=self.max_results,
                     NextToken=next_token
                 )
                 return response.get('FindingIds')
