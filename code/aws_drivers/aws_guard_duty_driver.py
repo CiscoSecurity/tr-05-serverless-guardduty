@@ -33,7 +33,6 @@ class GuardDutyDriver(object):
     def __init__(self):
         self.region = current_app.config['AWS_REGION']
         self.access_key = current_app.config['AWS_ACCESS_KEY_ID']
-        self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
         self.secret_access_key = current_app.config['AWS_SECRET_ACCESS_KEY']
         try:
             self.driver = boto3.client(
@@ -50,7 +49,7 @@ class GuardDutyDriver(object):
 
         def __init__(self, root):
             self.driver = root.driver
-            self.detector = root.detector
+            self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
 
         def list(self, criterion, max_results=20, next_token=''):
             try:
