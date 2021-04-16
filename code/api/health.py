@@ -13,6 +13,6 @@ def health():
     guard_duty = GuardDutyDriver()
     observable = Observable.of(type_='ip')
     criterion = observable.query(observable='1.1.1.1')
-    _ = guard_duty.findings.list(criterion)
+    _ = guard_duty.findings.list_by(criterion)
 
     return jsonify_data({'status': 'ok'})

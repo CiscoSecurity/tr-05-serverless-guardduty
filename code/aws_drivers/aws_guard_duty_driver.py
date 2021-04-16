@@ -56,7 +56,7 @@ class GuardDutyDriver(object):
             except (ValueError, AssertionError):
                 self.max_results = current_app.config['DEFAULT_CTR_ENTITIES_LIMIT']
 
-        def list(self, criterion, next_token=''):
+        def list_by(self, criterion, next_token=''):
             try:
                 response = self.driver.list_findings(
                     DetectorId=self.detector,
