@@ -93,7 +93,6 @@ def get_jwt():
         jwks_host = jwt.decode(
             token, options={'verify_signature': False}
         ).get('jwks_host')
-        assert jwks_host
         key = get_public_key(jwks_host, token)
         aud = request.url_root
         payload = jwt.decode(
@@ -105,7 +104,7 @@ def get_jwt():
         set_environment_variable(payload, 'AWS_SECRET_ACCESS_KEY')
         set_environment_variable(payload, 'AWS_GUARD_DUTY_DETECTOR_ID')
 
-        return payload['key']
+        return payload
     except tuple(expected_errors) as error:
         message = expected_errors[error.__class__]
         raise AuthorizationError(message)
