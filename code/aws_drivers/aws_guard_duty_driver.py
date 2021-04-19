@@ -12,7 +12,8 @@ from botocore.exceptions import (
     NoCredentialsError,
     PartialCredentialsError,
     ParamValidationError,
-    EndpointConnectionError
+    EndpointConnectionError,
+    ClientError
 )
 
 expected_errors = {
@@ -21,7 +22,8 @@ expected_errors = {
     NoCredentialsError: GDAuthError,
     ParamValidationError: GDParamsValidationError,
     EndpointConnectionError: GDRegionError,
-    ValueError: GDBadRequestError
+    ValueError: GDBadRequestError,
+    ClientError: GDBadRequestError
 }
 
 
