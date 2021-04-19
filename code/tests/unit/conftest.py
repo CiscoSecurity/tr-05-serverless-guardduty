@@ -21,20 +21,24 @@ def client():
 @fixture(scope='session')
 def valid_jwt(client):
     def _make_jwt(
-            key='some_key',
             jwks_host='visibility.amp.cisco.com',
             aud='http://localhost',
             kid='02B1174234C29F8EFB69911438F597FF3FFEE6B7',
+            access_key='access_key',
+            secret_access_key='secret_access_key',
+            detector='detector',
             wrong_structure=False
     ):
         payload = {
-            'key': key,
             'jwks_host': jwks_host,
             'aud': aud,
+            'AWS_ACCESS_KEY_ID': access_key,
+            'AWS_SECRET_ACCESS_KEY': secret_access_key,
+            'AWS_GUARD_DUTY_DETECTOR_ID': detector
         }
 
         if wrong_structure:
-            payload.pop('key')
+            payload.pop('AWS_ACCESS_KEY_ID')
 
         return jwt.encode(
             payload, client.application.rsa_private_key, algorithm='RS256',
