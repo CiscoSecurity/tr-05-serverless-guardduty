@@ -41,3 +41,21 @@ class IP(Observable):
                 }
             }
         }
+
+
+class IPV4(Observable):
+
+    @staticmethod
+    def type() -> str:
+        return 'ipv4'
+
+    def query(self, observable: str) -> dict:
+        return {
+            "Criterion": {
+                "service.action.networkConnectionAction.localIpDetails.ipAddressV4": {
+                    "Equals": [
+                        observable
+                    ]
+                }
+            }
+        }
