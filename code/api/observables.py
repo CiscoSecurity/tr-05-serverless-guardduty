@@ -41,3 +41,21 @@ class IP(Observable):
                 }
             }
         }
+
+
+class IPV6(Observable):
+
+    @staticmethod
+    def type() -> str:
+        return 'ipv6'
+
+    def query(self, observable: str) -> dict:
+        return {
+            "Criterion": {
+                "resource.instanceDetails.networkInterfaces.ipv6Addresses": {
+                    "Equals": [
+                        observable
+                    ]
+                }
+            }
+        }
