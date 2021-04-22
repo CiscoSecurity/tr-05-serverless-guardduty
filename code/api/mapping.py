@@ -9,9 +9,6 @@ from bundlebuilder.models import (
     ObservedTime
 )
 
-CTIM_DEFAULTS = {
-    'schema_version': '1.1.5'
-}
 SOURCE = 'AWS Guard Duty'
 SIGHTING = 'sighting'
 
