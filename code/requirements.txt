@@ -7,3 +7,4 @@ flake8==3.9.0
 coverage==5.2.1
 pytest==6.2.2
 boto3==1.17.52
+git+https://github.com/CiscoSecurity/tr-05-ctim-bundle-builder.git@develop#
