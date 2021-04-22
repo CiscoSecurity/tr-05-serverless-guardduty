@@ -2,10 +2,7 @@ UNKNOWN = 'unknown'
 AUTH_ERROR = 'authorization error'
 INVALID_ARGUMENT = 'invalid argument'
 HEALTH_CHECK_ERROR = 'health check failed'
-AWS_REGION_ERROR = 'aws region error'
-AWS_PARAMS_ERROR = 'aws params error'
-AWS_REQUEST_ERROR = 'aws request error'
-AWS_CREDENTIALS_ERROR = 'aws credentials error'
+GUARD_DUTY_ERROR = 'guard duty error'
 
 
 class TRFormattedError(Exception):
@@ -46,33 +43,9 @@ class WatchdogError(TRFormattedError):
         )
 
 
-class GDRegionError(TRFormattedError):
+class GuardDutyError(TRFormattedError):
     def __init__(self, message):
         super().__init__(
-            code=AWS_REGION_ERROR,
-            message=message
-        )
-
-
-class GDAuthError(TRFormattedError):
-    def __init__(self, message):
-        super().__init__(
-            code=AWS_CREDENTIALS_ERROR,
-            message=f'Authorization failed: {message}'
-        )
-
-
-class GDParamsValidationError(TRFormattedError):
-    def __init__(self, message):
-        super().__init__(
-            code=AWS_PARAMS_ERROR,
-            message=message
-        )
-
-
-class GDBadRequestError(TRFormattedError):
-    def __init__(self, message):
-        super().__init__(
-            code=AWS_REQUEST_ERROR,
+            code=GUARD_DUTY_ERROR,
             message=message
         )

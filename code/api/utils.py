@@ -2,7 +2,7 @@ import jwt
 import json
 import requests
 
-from flask import request, jsonify, current_app
+from flask import request, jsonify, current_app, g
 from requests.exceptions import ConnectionError, InvalidURL
 from api.errors import AuthorizationError, InvalidArgumentError
 from jwt import InvalidSignatureError, DecodeError, InvalidAudienceError
@@ -132,5 +132,42 @@ def jsonify_data(data):
     return jsonify({'data': data})
 
 
+def format_docs(docs):
+    return {'count': len(docs), 'docs': docs}
+
+
+def jsonify_result():
+    result = {'data': {}}
+
+    if g.get('verdicts'):
+        result['data']['verdicts'] = format_docs(g.verdicts)
+    if g.get('judgements'):
+        result['data']['judgements'] = format_docs(g.judgements)
+    if g.get('sightings'):
+        result['data']['sightings'] = format_docs(g.sightings)
+
+    if g.get('errors'):
+        result['errors'] = g.errors
+        if not result['data']:
+            del result['data']
+
+    return jsonify(result)
+
+
 def jsonify_errors(data):
     return jsonify({'errors': [data]})
+
+
+def remove_duplicates(observables):
+    return [dict(t) for t in {tuple(d.items()) for d in observables}]
+
+
+class RangeDict(dict):
+    def __getitem__(self, item):
+        if not isinstance(item, range):
+            for key in self:
+                if item in key:
+                    return self[key]
+            raise KeyError(item)
+        else:
+            return super().__getitem__(item)
