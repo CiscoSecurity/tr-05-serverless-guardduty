@@ -26,7 +26,7 @@ class Observable(metaclass=ABCMeta):
         """Returns criterion."""
 
     @staticmethod
-    def refer(value: str) -> Dict[str, Union[str, List[str]]]:
+    def refer(value: str) -> dict:
         """Build an GuardDuty reference for the current observable."""
         url = current_app.config['GUARD_DUTY_REFER_URL']
         return {
