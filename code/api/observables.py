@@ -30,9 +30,9 @@ class Observable(metaclass=ABCMeta):
         """Build an GuardDuty reference for the current observable."""
         url = current_app.config['GUARD_DUTY_REFER_URL']
         return {
-            'id': f'ref-aws-detective-search-ipaddress-{value}',
-            'title': 'Search for this ip',
-            'description': 'Check this ip with AWS Detective',
+            'id': f'ref-aws-detective-search-ip-{value}',
+            'title': 'Search for this IP',
+            'description': 'Check this IP with AWS Detective',
             'url': url.format(region=current_app.config['AWS_REGION'],
                               observable=value),
             'categories': ['Search', 'AWS Detective'],
