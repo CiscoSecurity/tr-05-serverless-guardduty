@@ -2,7 +2,7 @@ from functools import partial
 from api.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
-from flask import Blueprint, g, current_app
+from flask import Blueprint, g
 from aws_drivers.aws_guard_duty_driver import GuardDutyDriver
 from api.utils import (
     get_json,
