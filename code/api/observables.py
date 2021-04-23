@@ -1,5 +1,6 @@
-from typing import Optional
+from flask import current_app
 from abc import ABCMeta, abstractmethod
+from typing import Optional, Dict, Union, List
 
 
 class Observable(metaclass=ABCMeta):
@@ -23,6 +24,19 @@ class Observable(metaclass=ABCMeta):
     @abstractmethod
     def query(self, observable: str) -> dict:
         """Returns criterion."""
+
+    @staticmethod
+    def refer(value: str) -> dict:
+        """Build an GuardDuty reference for the current observable."""
+        url = current_app.config['GUARD_DUTY_REFER_URL']
+        return {
+            'id': f'ref-aws-detective-search-ip-{value}',
+            'title': 'Search for this IP',
+            'description': 'Check this IP with AWS Detective',
+            'url': url.format(region=current_app.config['AWS_REGION'],
+                              observable=value),
+            'categories': ['Search', 'AWS Detective'],
+        }
 
 
 class IP(Observable):
