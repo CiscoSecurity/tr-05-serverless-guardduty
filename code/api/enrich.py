@@ -1,8 +1,8 @@
 from functools import partial
-from flask import Blueprint, g
 from api.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
+from flask import Blueprint, g
 from aws_drivers.aws_guard_duty_driver import GuardDutyDriver
 from api.utils import (
     get_json,
@@ -36,8 +36,7 @@ def observe_observables():
     g.sightings = []
 
     for observable in observables:
-        type_ = observable['type']
-        value = observable['value']
+        type_, value = observable.values()
         observable = Observable.of(type_)
         if observable is None:
             continue
@@ -55,5 +54,17 @@ def observe_observables():
 @enrich_api.route('/refer/observables', methods=['POST'])
 def refer_observables():
     _ = get_jwt()
-    _ = get_observables()
-    return jsonify_data([])
+
+    observables = get_observables()
+
+    data = []
+
+    for observable in observables:
+        type_, value = observable.values()
+        observable = Observable.of(type_)
+        if observable is None:
+            continue
+
+        reference = observable.refer(value)
+        data.append(reference)
+    return jsonify_data(data)
