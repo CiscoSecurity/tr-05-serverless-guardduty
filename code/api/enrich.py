@@ -59,14 +59,12 @@ def refer_observables():
 
     data = []
 
-    url = current_app.config['GUARD_DUTY_REFER_URL']
-
     for observable in observables:
         type_, value = observable.values()
         observable = Observable.of(type_)
         if observable is None:
             continue
 
-        reference = observable.refer(url, value)
+        reference = observable.refer(value)
         data.append(reference)
     return jsonify_data(data)

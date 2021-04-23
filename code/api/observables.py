@@ -26,8 +26,9 @@ class Observable(metaclass=ABCMeta):
         """Returns criterion."""
 
     @staticmethod
-    def refer(url: str, value: str) -> Dict[str, Union[str, List[str]]]:
+    def refer(value: str) -> Dict[str, Union[str, List[str]]]:
         """Build an GuardDuty reference for the current observable."""
+        url = current_app.config['GUARD_DUTY_REFER_URL']
         return {
             'id': f'ref-aws-guard-duty-search-ipaddress-{value}',
             'title': 'Search for this ip',
