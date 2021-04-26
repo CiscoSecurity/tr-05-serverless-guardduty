@@ -77,7 +77,8 @@ class Mapping:
         @staticmethod
         def observables(finding: OrderedDict):
 
-            interfaces = finding['Resource']['InstanceDetails']['NetworkInterfaces']
+            interfaces = \
+                finding['Resource']['InstanceDetails']['NetworkInterfaces']
 
             def observable(type_, value):
                 for data in interfaces:
