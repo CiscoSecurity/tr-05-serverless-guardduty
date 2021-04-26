@@ -1,18 +1,22 @@
 from datetime import datetime
 from flask import current_app
+from typing import OrderedDict
 from api.utils import RangeDict
 
 from bundlebuilder.models import (
     ObservedRelation,
     Observable,
     Sighting,
-    ObservedTime
+    ObservedTime,
+    IdentitySpecification
 )
 
-SOURCE = 'AWS Guard Duty'
+SOURCE = 'AWS GuardDuty Alerts'
 SIGHTING = 'sighting'
 
+SENSOR = 'network.ips'
 SIGHTING_DEFAULTS = {
+    'sensor': SENSOR,
     'confidence': 'High',
     'source': SOURCE
 }
@@ -20,14 +24,6 @@ SIGHTING_DEFAULTS = {
 SOURCE_URI = \
     'https://console.aws.amazon.com/guardduty/home?' \
     '{region}/findings?macros=current&fId={finding_id}'
-
-INBOUND = 'INBOUND'
-OUTBOUND = 'OUTBOUND'
-
-CONNECTION = {
-    INBOUND: 'Connected_From',
-    OUTBOUND: 'Connected_To'
-}
 
 NETWORK_CONNECTION = 'NETWORK_CONNECTION'
 PORT_PROBE = 'PORT_PROBE'
@@ -52,18 +48,15 @@ class Mapping:
         self.sighting = self.Sighting(self)
 
     @staticmethod
-    def date(date_):
-        date_str = datetime.strptime(date_, '%Y-%m-%dT%H:%M:%S.%fZ')
-        date_ = f'{date_str.isoformat(timespec="seconds")}Z'
-        return date_
-
-    @staticmethod
     def ip(action, type_):
         return action[type_]['IpAddressV4']
 
     @staticmethod
-    def action(data):
-        return data['Service']['Action']
+    def service(data):
+        return data['Service']
+
+    def action(self, data):
+        return self.service(data)['Action']
 
     def action_data(self, data, type_):
         actions = {
@@ -77,23 +70,33 @@ class Mapping:
     def action_type(self, data):
         return self.action(data)['ActionType']
 
-    def direction(self, finding):
-        action = self.action_data(finding, NETWORK_CONNECTION)
-        return CONNECTION[action['ConnectionDirection']]
-
     class Sighting:
         def __init__(self, root):
             self.root = root
 
+        @staticmethod
+        def observables(finding: OrderedDict):
+
+            interfaces = finding['Resource']['InstanceDetails']['NetworkInterfaces']
+
+            def observable(type_, value):
+                for data in interfaces:
+                    if data.get(value, 'Unknown') != 'Unknown':
+                        return Observable(type=type_, value=data[value])
+
+            yield observable('ip', 'PublicIp')
+            yield observable('domain', 'PublicDnsName')
+
         def _observed_time(self, finding):
-            start_date = self.root.date(finding['CreatedAt'])
-            end_date = self.root.date(finding['UpdatedAt'])
+            service = self.root.service(finding)
+            start_date = service['EventFirstSeen']
+            end_date = service['EventLastSeen']
 
             return ObservedTime(start_time=start_date,
                                 end_time=end_date)
 
         def _timestamp(self, finding):
-            unix_timestamp = finding['UpdatedAt']
+            unix_timestamp = self.root.service(finding)['EventLastSeen']
             return self.root.time_format(
                 datetime.utcfromtimestamp(unix_timestamp)
             )
@@ -104,7 +107,7 @@ class Mapping:
             )
 
         def _relations(self, finding):
-            def relation(source, target, type_):
+            def relation(source, type_, target):
                 source_type, source_value = source
                 target_type, target_value = target
 
@@ -125,9 +128,18 @@ class Mapping:
             if action_type == NETWORK_CONNECTION:
                 yield relation(
                     ['ip', self.root.ip(data, 'LocalIpDetails')],
-                    ['ip', self.root.ip(data, 'RemoteIpDetails')],
-                    self.root.direction(finding)
+                    'Connected_To',
+                    ['ip', self.root.ip(data, 'RemoteIpDetails')]
                 )
+
+        def _targets(self, finding):
+            return IdentitySpecification(
+                observables=[
+                    x for x in self.observables(finding) if x is not None
+                ],
+                observed_time=self._observed_time(finding),
+                type=SENSOR
+            )
 
         def extract(self, finding):
 
@@ -141,5 +153,6 @@ class Mapping:
                 count=finding['Service']['Count'],
                 severity=SEVERITY[int(finding['Severity'])],
                 relations=[x for x in self._relations(finding) if x],
+                targets=[self._targets(finding)],
                 **SIGHTING_DEFAULTS
             ).json

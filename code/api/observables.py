@@ -1,6 +1,6 @@
 from flask import current_app
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Dict, Union, List
+from typing import Optional
 
 
 class Observable(metaclass=ABCMeta):
@@ -48,25 +48,8 @@ class IP(Observable):
     def query(self, observable: str) -> dict:
         return {
             "Criterion": {
-                "resource.instanceDetails.networkInterfaces.publicIp": {
-                    "Equals": [
-                        observable
-                    ]
-                }
-            }
-        }
-
-
-class IPV6(Observable):
-
-    @staticmethod
-    def type() -> str:
-        return 'ipv6'
-
-    def query(self, observable: str) -> dict:
-        return {
-            "Criterion": {
-                "resource.instanceDetails.networkInterfaces.ipv6Addresses": {
+                "service.action.networkConnectionAction."
+                "remoteIpDetails.ipAddressV4": {
                     "Equals": [
                         observable
                     ]
