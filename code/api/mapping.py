@@ -11,7 +11,7 @@ from bundlebuilder.models import (
     IdentitySpecification
 )
 
-SOURCE = 'AWS GuardDuty Alerts'
+SOURCE = 'AWS GuardDuty findings'
 SIGHTING = 'sighting'
 
 SENSOR = 'network.ips'
@@ -36,6 +36,15 @@ SEVERITY = RangeDict({
     range(4, 7): 'Medium',
     range(1, 4): 'Low'
 })
+
+
+LOCAL_IP = 'LocalIpDetails'
+REMOTE_IP = 'RemoteIpDetails'
+
+DIRECTION = {
+    'INBOUND': (REMOTE_IP, LOCAL_IP),
+    'OUTBOUND': (LOCAL_IP, REMOTE_IP)
+}
 
 
 class Mapping:
@@ -128,10 +137,11 @@ class Mapping:
             action_type = self.root.action_type(finding)
             data = self.root.action_data(finding, action_type)
             if action_type == NETWORK_CONNECTION:
+                source, target = DIRECTION[data['ConnectionDirection']]
                 yield relation(
-                    ['ip', self.root.ip(data, 'LocalIpDetails')],
+                    ['ip', self.root.ip(data, source)],
                     'Connected_To',
-                    ['ip', self.root.ip(data, 'RemoteIpDetails')]
+                    ['ip', self.root.ip(data, target)]
                 )
 
         def _targets(self, finding):
