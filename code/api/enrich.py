@@ -36,7 +36,7 @@ def observe_observables():
     g.sightings = []
 
     for observable in observables:
-        type_, value = observable.values()
+        type_, value = observable['type'], observable['value']
         observable = Observable.of(type_)
         if observable is None:
             continue
@@ -60,7 +60,7 @@ def refer_observables():
     data = []
 
     for observable in observables:
-        type_, value = observable.values()
+        type_, value = observable['type'], observable['value']
         observable = Observable.of(type_)
         if observable is None:
             continue
