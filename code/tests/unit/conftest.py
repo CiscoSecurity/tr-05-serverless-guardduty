@@ -27,11 +27,13 @@ def valid_jwt(client):
             access_key='access_key',
             secret_access_key='secret_access_key',
             detector='detector',
+            region='region',
             wrong_structure=False
     ):
         payload = {
             'jwks_host': jwks_host,
             'aud': aud,
+            'AWS_REGION': region,
             'AWS_ACCESS_KEY_ID': access_key,
             'AWS_SECRET_ACCESS_KEY': secret_access_key,
             'AWS_GUARD_DUTY_DETECTOR_ID': detector

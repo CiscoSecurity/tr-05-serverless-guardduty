@@ -27,13 +27,16 @@ class GuardDutyDriver(object):
     class Finding:
 
         def __init__(self, root):
-            self.driver = root.driver
+            self._findings = []
             self.max_results = 50
-            self.findings = []
+            self.driver = root.driver
             self.ctr_limit = current_app.config['CTR_ENTITIES_LIMIT']
             self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
 
-        def get(self, criterion, limit=None, next_token=''):
+        def get(self):
+            return self._findings
+
+        def list_by(self, criterion, limit=None, next_token=''):
             try:
                 limit = self.ctr_limit if not limit else limit
 
@@ -51,13 +54,12 @@ class GuardDutyDriver(object):
                 ).get('Findings')
 
                 for finding in findings:
-                    if len(self.findings) < self.ctr_limit:
-                        self.findings.append(finding)
+                    if len(self._findings) < self.ctr_limit \
+                            and finding not in self._findings:
+                        self._findings.append(finding)
             except (BotoCoreError, ValueError, ClientError) as error:
                 raise GuardDutyError(error.args[0])
 
             next_token = response.get('NextToken')
-            if next_token and len(self.findings) < self.ctr_limit:
-                self.get(criterion, limit - self.max_results, next_token)
-
-            return self.findings
+            if next_token and len(self._findings) < self.ctr_limit:
+                self.list_by(criterion, limit - self.max_results, next_token)
