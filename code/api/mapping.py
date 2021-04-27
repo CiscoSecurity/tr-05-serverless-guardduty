@@ -82,7 +82,7 @@ class Mapping:
 
             def observable(type_, value):
                 for data in interfaces:
-                    if data.get(value, 'Unknown') != 'Unknown':
+                    if data.get(value):
                         return Observable(type=type_, value=data[value])
 
             yield observable('ip', 'PublicIp')
