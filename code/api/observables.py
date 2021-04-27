@@ -45,14 +45,36 @@ class IP(Observable):
     def type() -> str:
         return 'ip'
 
-    def query(self, observable: str) -> dict:
-        return {
-            "Criterion": {
-                "service.action.networkConnectionAction."
-                "remoteIpDetails.ipAddressV4": {
-                    "Equals": [
-                        observable
-                    ]
+    def query(self, observable: str) -> list:
+        return [
+            {
+                "Criterion": {
+                    "service.action.networkConnectionAction."
+                    "remoteIpDetails.ipAddressV4": {
+                        "Equals": [
+                            observable
+                        ]
+                    }
+                }
+            },
+            {
+                "Criterion": {
+                    "service.action.networkConnectionAction."
+                    "localIpDetails.ipAddressV4": {
+                        "Equals": [
+                            observable
+                        ]
+                    }
+                }
+            },
+            {
+                "Criterion": {
+                    "service.action.networkConnectionAction."
+                    "localIpDetails.ipAddressV4": {
+                        "Equals": [
+                            observable
+                        ]
+                    }
                 }
             }
-        }
+        ]
