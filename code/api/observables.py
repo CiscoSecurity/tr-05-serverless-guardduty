@@ -3,8 +3,32 @@ from abc import ABCMeta, abstractmethod
 from typing import Optional
 
 
+IP_ATTRS = [
+    "resource.instanceDetails.networkInterfaces.publicIp",
+    "service.action.awsApiCallAction.remoteIpDetails.ipAddressV4",
+    "service.action.networkConnectionAction.localIpDetails.ipAddressV4",
+    "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4"
+]
+
+IPV6_ATTRS = [
+    "resource.instanceDetails.networkInterfaces.ipv6Addresses"
+]
+
+
 class Observable(metaclass=ABCMeta):
     """An observable to search records for."""
+
+    @staticmethod
+    def criterion(attribute: str, observable: str, condition: str = 'Equals'):
+        return {
+            "Criterion": {
+                attribute: {
+                    condition: [
+                        observable
+                    ]
+                }
+            }
+        }
 
     @staticmethod
     def of(type_: str) -> Optional['Observable']:
@@ -23,7 +47,7 @@ class Observable(metaclass=ABCMeta):
 
     @abstractmethod
     def query(self, observable: str) -> dict:
-        """Returns criterion."""
+        """Returns criteria."""
 
     @staticmethod
     def refer(value: str) -> dict:
@@ -45,14 +69,19 @@ class IP(Observable):
     def type() -> str:
         return 'ip'
 
-    def query(self, observable: str) -> dict:
-        return {
-            "Criterion": {
-                "service.action.networkConnectionAction."
-                "remoteIpDetails.ipAddressV4": {
-                    "Equals": [
-                        observable
-                    ]
-                }
-            }
-        }
+    def query(self, observable: str) -> list:
+        return [
+            self.criterion(attribute, observable) for attribute in IP_ATTRS
+        ]
+
+
+class IPv6(Observable):
+
+    @staticmethod
+    def type() -> str:
+        return 'ipv6'
+
+    def query(self, observable: str) -> list:
+        return [
+            self.criterion(attribute, observable) for attribute in IPV6_ATTRS
+        ]

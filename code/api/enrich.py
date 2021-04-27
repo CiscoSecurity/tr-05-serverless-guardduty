@@ -40,13 +40,16 @@ def observe_observables():
         observable = Observable.of(type_)
         if observable is None:
             continue
-        criterion = observable.query(value)
+        criteria = observable.query(value)
 
         mapping = Mapping(type_, value)
-        findings = guard_duty.findings.get(criterion)
+        for criterion in criteria:
+            guard_duty.findings.list_by(criterion)
 
+        findings = guard_duty.findings.get()
         for finding in findings:
-            g.sightings.append(mapping.sighting.extract(finding))
+            if finding not in g.sightings:
+                g.sightings.append(mapping.sighting.extract(finding))
 
     return jsonify_result()
 

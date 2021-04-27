@@ -9,5 +9,4 @@ class Config:
 
     GUARD_DUTY_REFER_URL = \
         'https://{region}.console.aws.amazon.com/detective/' \
-        'home?region={region}#entities/IpAddress/' \
-        '{observable}?scopeStart=1618333200000&scopeEnd=1618390800000&r=760'
+        'home?region={region}#entities/IpAddress/{observable}'
