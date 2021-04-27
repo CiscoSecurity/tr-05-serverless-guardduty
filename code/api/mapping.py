@@ -23,7 +23,8 @@ SIGHTING_DEFAULTS = {
 
 SOURCE_URI = \
     'https://console.aws.amazon.com/guardduty/home?' \
-    '{region}/findings?macros=current&fId={finding_id}'
+    '{region}/findings&region={region}#/findings?' \
+    'macros=current&fId={finding_id}'
 
 NETWORK_CONNECTION = 'NETWORK_CONNECTION'
 PORT_PROBE = 'PORT_PROBE'
