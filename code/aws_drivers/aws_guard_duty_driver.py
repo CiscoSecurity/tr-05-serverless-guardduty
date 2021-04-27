@@ -33,31 +33,32 @@ class GuardDutyDriver(object):
             self.ctr_limit = current_app.config['CTR_ENTITIES_LIMIT']
             self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
 
-        def get(self, criterion, limit=None, next_token=''):
-            try:
-                limit = self.ctr_limit if not limit else limit
+        def get(self, criteria, limit=None, next_token=''):
+            for criterion in criteria:
+                try:
+                    limit = self.ctr_limit if not limit else limit
 
-                response = self.driver.list_findings(
-                    DetectorId=self.detector,
-                    FindingCriteria=criterion,
-                    MaxResults=limit if limit <= self.max_results
-                    else self.max_results,
-                    NextToken=next_token
-                )
+                    response = self.driver.list_findings(
+                        DetectorId=self.detector,
+                        FindingCriteria=criterion,
+                        MaxResults=limit if limit <= self.max_results
+                        else self.max_results,
+                        NextToken=next_token
+                    )
 
-                findings = self.driver.get_findings(
-                    DetectorId=self.detector,
-                    FindingIds=response.get('FindingIds')
-                ).get('Findings')
+                    findings = self.driver.get_findings(
+                        DetectorId=self.detector,
+                        FindingIds=response.get('FindingIds')
+                    ).get('Findings')
 
-                for finding in findings:
-                    if len(self.findings) < self.ctr_limit:
-                        self.findings.append(finding)
-            except (BotoCoreError, ValueError, ClientError) as error:
-                raise GuardDutyError(error.args[0])
+                    for finding in findings:
+                        if len(self.findings) < self.ctr_limit:
+                            self.findings.append(finding)
+                except (BotoCoreError, ValueError, ClientError) as error:
+                    raise GuardDutyError(error.args[0])
 
-            next_token = response.get('NextToken')
-            if next_token and len(self.findings) < self.ctr_limit:
-                self.get(criterion, limit - self.max_results, next_token)
+                next_token = response.get('NextToken')
+                if next_token and len(self.findings) < self.ctr_limit:
+                    self.get(criterion, limit - self.max_results, next_token)
 
             return self.findings
