@@ -12,7 +12,6 @@ from api.utils import (
     jsonify_result
 )
 
-
 enrich_api = Blueprint('enrich', __name__)
 
 get_observables = partial(get_json, schema=ObservableSchema(many=True))
@@ -31,9 +30,8 @@ def observe_observables():
     guard_duty = GuardDutyDriver()
     observables = remove_duplicates(get_observables())
 
-    g.verdicts = []
-    g.judgements = []
     g.sightings = []
+    g.indicators = []
 
     for observable in observables:
         type_, value = observable['type'], observable['value']
@@ -42,14 +40,20 @@ def observe_observables():
             continue
         criteria = observable.query(value)
 
-        mapping = Mapping(type_, value)
         for criterion in criteria:
             guard_duty.findings.list_by(criterion)
 
         findings = guard_duty.findings.get()
         for finding in findings:
-            if finding not in g.sightings:
-                g.sightings.append(mapping.sighting.extract(finding))
+            mapping = Mapping(type_, value, finding)
+
+            sighting = mapping.get_sighting()
+            if sighting not in g.sightings:
+                g.sightings.append(sighting)
+
+            indicator = mapping.get_indicator()
+            if indicator not in g.indicators:
+                g.indicators.append(indicator)
 
     return jsonify_result()
 
