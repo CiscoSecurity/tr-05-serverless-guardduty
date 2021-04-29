@@ -1,6 +1,6 @@
 from flask import current_app
 from api.utils import RangeDict
-from api.mapping.finding import Finding
+from .finding import Finding
 from bundlebuilder.models import (
     Observable,
     ObservedTime,
