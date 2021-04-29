@@ -1,5 +1,5 @@
 from functools import partial
-from api.mapping import Mapping
+from mappings.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
 from flask import Blueprint, g
@@ -11,7 +11,6 @@ from api.utils import (
     remove_duplicates,
     jsonify_result
 )
-
 
 enrich_api = Blueprint('enrich', __name__)
 
@@ -31,25 +30,31 @@ def observe_observables():
     guard_duty = GuardDutyDriver()
     observables = remove_duplicates(get_observables())
 
-    g.verdicts = []
-    g.judgements = []
     g.sightings = []
+    g.indicators = []
 
     for observable in observables:
         type_, value = observable['type'], observable['value']
-        observable = Observable.of(type_)
-        if observable is None:
+        target = Observable.of(type_)
+        if target is None:
             continue
-        criteria = observable.query(value)
+        criteria = target.query(value)
 
-        mapping = Mapping(type_, value)
         for criterion in criteria:
             guard_duty.findings.list_by(criterion)
 
         findings = guard_duty.findings.get()
         for finding in findings:
-            if finding not in g.sightings:
-                g.sightings.append(mapping.sighting.extract(finding))
+            try:
+                mapping = Mapping(finding, **observable)
+
+                sighting = mapping.extract_sighting()
+                g.sightings.append(sighting)
+
+                indicator = mapping.extract_indicator()
+                g.indicators.append(indicator)
+            except KeyError:
+                continue
 
     return jsonify_result()
 
