@@ -1,84 +1,97 @@
 import json
 
+INBOUND = 'INBOUND'
+OUTBOUND = 'OUTBOUND'
+
 
 class Network:
-    def __init__(self, json_):
-        self.direction = json_['ConnectionDirection']
-        self.remote = self.Remote(json_)
-        self.local = self.Local(json_)
+
+    def __init__(self, data):
+        self.local = self.Local(data)
+        self.remote = self.Remote(data)
+        self.direction = self.direction(data['ConnectionDirection'])
+
+    def direction(self, type_):
+        directing = {
+            INBOUND: [self.remote, self.local],
+            OUTBOUND: [self.local, self.remote]
+        }
+        return directing[type_]
 
     class Local:
-        def __init__(self, json_):
-            self.__dict__ = json.loads(json.dumps(json_['LocalIpDetails']))
+        def __init__(self, data):
+            self.__dict__ = json.loads(json.dumps(data['LocalIpDetails']))
 
     class Remote:
-        def __init__(self, json_):
-            self.__dict__ = json.loads(json.dumps(json_['RemoteIpDetails']))
+        def __init__(self, data):
+            self.__dict__ = json.loads(json.dumps(data['RemoteIpDetails']))
 
 
 class Finding(object):
-    def __init__(self, json_):
 
-        self.service = self.Service(json_['Service'])
-        self.resource = self.Resource(json_['Resource'])
-        self.severity = json_['Severity']
-        self.title = json_['Title']
-        self.type = json_['Type']
-        self.description = json_['Description']
+    def __init__(self, data):
+        self.id = data['Id']
+        self.type = data['Type']
+        self.title = data['Title']
+        self.severity = data['Severity']
+        self.description = data['Description']
+        self.service = self.Service(data['Service'])
+        self.resource = self.Resource(data['Resource'])
 
     class Service:
-        def __init__(self, json_):
-            self.action = self.Action(json_['Action'])
-            self.first_seen = json_['EventFirstSeen']
-            self.last_seen = json_['EventLastSeen']
-            self.count = json_['Count']
+        def __init__(self, data):
+            self.count = data['Count']
+            self.last_seen = data['EventLastSeen']
+            self.first_seen = data['EventFirstSeen']
+            self.action = self.Action(data['Action'])
 
         class Action:
 
-            NETWORK_CONNECTION = 'NETWORK_CONNECTION'
             PORT_PROBE = 'PORT_PROBE'
             DNS_REQUEST = 'DNS_REQUEST'
             AWS_API_CALL = 'AWS_API_CALL'
+            CONNECTION = 'NETWORK_CONNECTION'
 
-            def __init__(self, json_):
-                self.type = json_['ActionType']
+            def __init__(self, data):
+                self.type = data['ActionType']
 
                 actions = {
                     self.DNS_REQUEST: lambda d: self.DNSRequest(d),
                     self.AWS_API_CALL: lambda d: self.AWSAPICall(d),
-                    self.NETWORK_CONNECTION: lambda d: self.NetworkConnection(d),
-                    self.PORT_PROBE: lambda d: self.PortProbe(d)
+                    self.PORT_PROBE: lambda d: self.PortProbe(d),
+                    self.CONNECTION: lambda d: self.Connection(d)
                 }
-                self.data = actions[self.type](json_)
+                self.data = actions[self.type](data)
 
             class DNSRequest:
-                def __init__(self, json_):
-                    self.__dict__ = json.loads(json.dumps(json_['DnsRequestAction']))
+                def __init__(self, data):
+                    self.__dict__ = \
+                        json.loads(json.dumps(data['DnsRequestAction']))
 
             class AWSAPICall:
-                def __init__(self, json_):
-                    self.__dict__ = json.loads(json.dumps(json_['AwsApiCallAction']))
+                def __init__(self, data):
+                    self.__dict__ = \
+                        json.loads(json.dumps(data['AwsApiCallAction']))
 
-            class PortProbe(Network):
-                def __init__(self, json_):
-                    super().__init__(json_['PortProbeAction']['PortProbeDetails'])
+            class PortProbe:
+                def __init__(self, data):
+                    self.details = data['PortProbeAction']['PortProbeDetails']
 
-            class NetworkConnection(Network):
-                def __init__(self, json_):
-                    super().__init__(json_['NetworkConnectionAction'])
+            class Connection(Network):
+                def __init__(self, data):
+                    super().__init__(data['NetworkConnectionAction'])
 
     class Resource:
-        def __init__(self, json_):
-            self.type = json_['ResourceType']
-            self.details = self.InstanceDetails(json_['InstanceDetails'])
+        def __init__(self, data):
+            self.type = data['ResourceType']
+            self.details = self.Details(data['InstanceDetails'])
 
-        class InstanceDetails:
-            def __init__(self, json_):
-                self.platform = json_['Platform']
+        class Details:
+            def __init__(self, data):
                 self.interfaces = [
-                    self.NetworkInterface(interface) for interface in json_['NetworkInterfaces']
+                    self.Interface(obj) for obj in data['NetworkInterfaces']
                 ]
 
-            class NetworkInterface:
-                def __init__(self, json_):
-                    self.__dict__ = json.loads(json.dumps(json_))
+            class Interface:
+                def __init__(self, data):
+                    self.__dict__ = json.loads(json.dumps(data))
