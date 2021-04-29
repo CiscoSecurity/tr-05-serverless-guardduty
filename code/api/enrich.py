@@ -1,5 +1,5 @@
 from functools import partial
-from api.mapping import Mapping
+from api.mapping.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
 from flask import Blueprint, g
@@ -35,25 +35,26 @@ def observe_observables():
 
     for observable in observables:
         type_, value = observable['type'], observable['value']
-        observable = Observable.of(type_)
-        if observable is None:
+        target = Observable.of(type_)
+        if target is None:
             continue
-        criteria = observable.query(value)
+        criteria = target.query(value)
 
         for criterion in criteria:
             guard_duty.findings.list_by(criterion)
 
         findings = guard_duty.findings.get()
         for finding in findings:
-            mapping = Mapping(type_, value, finding)
+            try:
+                mapping = Mapping(finding, **observable)
 
-            sighting = mapping.get_sighting()
-            if sighting not in g.sightings:
+                sighting = mapping.extract_sighting()
                 g.sightings.append(sighting)
 
-            indicator = mapping.get_indicator()
-            if indicator not in g.indicators:
+                indicator = mapping.extract_indicator()
                 g.indicators.append(indicator)
+            except KeyError:
+                continue
 
     return jsonify_result()
 
