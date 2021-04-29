@@ -9,14 +9,11 @@ class Network:
     def __init__(self, data):
         self.local = self.Local(data)
         self.remote = self.Remote(data)
-        self.direction = self.direction(data['ConnectionDirection'])
-
-    def direction(self, type_):
         directing = {
             INBOUND: [self.remote, self.local],
             OUTBOUND: [self.local, self.remote]
         }
-        return directing[type_]
+        self.direction = directing[data['ConnectionDirection']]
 
     class Local:
         def __init__(self, data):
