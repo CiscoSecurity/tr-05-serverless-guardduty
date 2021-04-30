@@ -1,8 +1,8 @@
 from functools import partial
+from flask import Blueprint, g
 from mappings.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
-from flask import Blueprint, g
 from aws_drivers.aws_guard_duty_driver import GuardDutyDriver
 from api.utils import (
     get_json,
@@ -32,6 +32,7 @@ def observe_observables():
 
     g.sightings = []
     g.indicators = []
+    g.relationships = []
 
     for observable in observables:
         type_, value = observable['type'], observable['value']
@@ -45,16 +46,21 @@ def observe_observables():
 
         findings = guard_duty.findings.get()
         for finding in findings:
-            try:
-                mapping = Mapping(finding, **observable)
+            mapping = Mapping(finding, **observable)
+            with mapping.set_session():
+                try:
+                    sighting = mapping.extract_sighting()
+                    g.sightings.append(sighting.json)
 
-                sighting = mapping.extract_sighting()
-                g.sightings.append(sighting)
+                    indicator = mapping.extract_indicator()
+                    g.indicators.append(indicator.json)
 
-                indicator = mapping.extract_indicator()
-                g.indicators.append(indicator)
-            except KeyError:
-                continue
+                    relationship = mapping.extract_relationship(
+                        sighting, indicator, 'based-on'
+                    )
+                    g.relationships.append(relationship.json)
+                except KeyError:
+                    continue
 
     return jsonify_result()
 
