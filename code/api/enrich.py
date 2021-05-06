@@ -56,7 +56,7 @@ def observe_observables():
                     g.indicators.append(indicator.json)
 
                     relationship = mapping.extract_relationship(
-                        sighting, indicator, 'based-on'
+                        sighting, indicator, 'sighting-of'
                     )
                     g.relationships.append(relationship.json)
                 except KeyError:
