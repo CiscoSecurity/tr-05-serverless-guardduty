@@ -9,7 +9,7 @@ AWS_API_CALL = 'AWS_API_CALL'
 CONNECTION = 'NETWORK_CONNECTION'
 
 
-class Action:
+class BaseAction:
     def __init__(self, data):
         self.remote_details = data['RemoteIpDetails']
         self.local_port_details = data['LocalPortDetails']
@@ -64,13 +64,13 @@ class Finding(object):
                     self.__dict__ = \
                         json.loads(json.dumps(data['AwsApiCallAction']))
 
-            class PortProbe(Action):
+            class PortProbe(BaseAction):
                 def __init__(self, data):
                     self.action = \
                         data['PortProbeAction']['PortProbeDetails'][0]
                     super().__init__(self.action)
 
-            class Connection(Action):
+            class Connection(BaseAction):
                 def __init__(self, data):
                     self.action = data['NetworkConnectionAction']
                     self.local_details = self.action['LocalIpDetails']
