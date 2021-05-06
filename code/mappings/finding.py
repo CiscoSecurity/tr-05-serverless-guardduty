@@ -3,25 +3,17 @@ import json
 INBOUND = 'INBOUND'
 OUTBOUND = 'OUTBOUND'
 
+PORT_PROBE = 'PORT_PROBE'
+DNS_REQUEST = 'DNS_REQUEST'
+AWS_API_CALL = 'AWS_API_CALL'
+CONNECTION = 'NETWORK_CONNECTION'
 
-class Network:
 
+class BaseAction:
     def __init__(self, data):
-        self.local = self.Local(data)
-        self.remote = self.Remote(data)
-        directing = {
-            INBOUND: [self.remote, self.local],
-            OUTBOUND: [self.local, self.remote]
-        }
-        self.direction = directing[data['ConnectionDirection']]
-
-    class Local:
-        def __init__(self, data):
-            self.__dict__ = json.loads(json.dumps(data['LocalIpDetails']))
-
-    class Remote:
-        def __init__(self, data):
-            self.__dict__ = json.loads(json.dumps(data['RemoteIpDetails']))
+        self.remote_details = data['RemoteIpDetails']
+        self.local_port_details = data['LocalPortDetails']
+        self.organization = self.remote_details['Organization']
 
 
 class Finding(object):
@@ -40,23 +32,25 @@ class Finding(object):
             self.count = data['Count']
             self.last_seen = data['EventLastSeen']
             self.first_seen = data['EventFirstSeen']
+            self.name = data['ServiceName']
             self.action = self.Action(data['Action'])
 
-        class Action:
+        def attrs(self):
+            data = self.action.data.organization
+            data.update(self.action.data.local_port_details)
+            data['ServiceName'] = self.name
+            return data
 
-            PORT_PROBE = 'PORT_PROBE'
-            DNS_REQUEST = 'DNS_REQUEST'
-            AWS_API_CALL = 'AWS_API_CALL'
-            CONNECTION = 'NETWORK_CONNECTION'
+        class Action:
 
             def __init__(self, data):
                 self.type = data['ActionType']
 
                 actions = {
-                    self.DNS_REQUEST: lambda d: self.DNSRequest(d),
-                    self.AWS_API_CALL: lambda d: self.AWSAPICall(d),
-                    self.PORT_PROBE: lambda d: self.PortProbe(d),
-                    self.CONNECTION: lambda d: self.Connection(d)
+                    DNS_REQUEST: lambda d: self.DNSRequest(d),
+                    AWS_API_CALL: lambda d: self.AWSAPICall(d),
+                    PORT_PROBE: lambda d: self.PortProbe(d),
+                    CONNECTION: lambda d: self.Connection(d)
                 }
                 self.data = actions[self.type](data)
 
@@ -70,13 +64,27 @@ class Finding(object):
                     self.__dict__ = \
                         json.loads(json.dumps(data['AwsApiCallAction']))
 
-            class PortProbe:
+            class PortProbe(BaseAction):
                 def __init__(self, data):
-                    self.details = data['PortProbeAction']['PortProbeDetails']
+                    self.action = \
+                        data['PortProbeAction']['PortProbeDetails'][0]
+                    super().__init__(self.action)
 
-            class Connection(Network):
+            class Connection(BaseAction):
                 def __init__(self, data):
-                    super().__init__(data['NetworkConnectionAction'])
+                    self.action = data['NetworkConnectionAction']
+                    self.local_details = self.action['LocalIpDetails']
+                    self.directing = self.action['ConnectionDirection']
+                    super().__init__(self.action)
+
+                def direction(self):
+                    local_ip = self.local_details['IpAddressV4']
+                    remote_ip = self.remote_details['IpAddressV4']
+                    directions = {
+                        INBOUND: [remote_ip, local_ip],
+                        OUTBOUND: [local_ip, remote_ip]
+                    }
+                    return directions[self.directing]
 
     class Resource:
         def __init__(self, data):

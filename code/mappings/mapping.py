@@ -10,7 +10,9 @@ from bundlebuilder.models import (
     Sighting,
     Indicator,
     ValidTime,
-    Relationship
+    Relationship,
+    SightingDataTable,
+    ColumnDefinition
 )
 
 CONFIDENCE = 'High'
@@ -38,6 +40,18 @@ DEFAULTS = {
     'confidence': CONFIDENCE,
     'source': SOURCE
 }
+
+COLUMNS_MAPPING = (
+    ("sensor name", "ServiceName"),
+    ("asn", "Asn"),
+    ("asn org", "AsnOrg"),
+    ("org", "Org"),
+    ("isp", "Isp"),
+    ("country", "CountryName"),
+    ("city", "CityName"),
+    ("local port", "Port"),
+    ("local port name", "PortName")
+)
 
 
 class Mapping:
@@ -97,11 +111,9 @@ class Mapping:
     def _relations(self):
         action_type = self.finding.service.action.type
         if action_type == NETWORK_CONNECTION:
-            source, target = self.finding.service.action.data.direction
+            source, target = self.finding.service.action.data.direction()
             yield self._relation(
-                ['ip', source.IpAddressV4],
-                'Connected_To',
-                ['ip', target.IpAddressV4]
+                ['ip', source], 'Connected_To', ['ip', target]
             )
 
     def _targets(self):
@@ -113,8 +125,24 @@ class Mapping:
             type=SENSOR
         )
 
+    def _data_table(self):
+        attrs = self.finding.service.attrs()
+        columns = []
+        rows = []
+
+        for key, value in COLUMNS_MAPPING:
+            if value in attrs.keys():
+                columns.append(ColumnDefinition(name=key, type='string'))
+                rows.append([attrs[value]])
+
+        return SightingDataTable(
+            columns=columns,
+            rows=rows
+        ).json
+
     def extract_sighting(self):
-        return Sighting(
+
+        sighting = Sighting(
             observables=[self.observable],
             title=self.finding.title,
             description=self.finding.description,
@@ -128,6 +156,13 @@ class Mapping:
             sensor=SENSOR,
             **DEFAULTS
         )
+
+        if self.finding.service.action.type in [
+            NETWORK_CONNECTION,
+            PORT_PROBE
+        ]:
+            sighting.json['data'] = self._data_table()
+        return sighting
 
     def extract_indicator(self):
         start_time = self.finding.service.first_seen
