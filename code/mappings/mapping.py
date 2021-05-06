@@ -1,6 +1,7 @@
+from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
-from .finding import Finding
+from bundlebuilder.session import Session
 from bundlebuilder.models import (
     Observable,
     ObservedTime,
@@ -8,11 +9,21 @@ from bundlebuilder.models import (
     IdentitySpecification,
     Sighting,
     Indicator,
-    ValidTime
+    ValidTime,
+    Relationship,
+    SightingDataTable,
+    ColumnDefinition
 )
 
-SIGHTING = 'sighting'
 CONFIDENCE = 'High'
+SIGHTING = 'sighting'
+SENSOR = 'network.ips'
+PORT_PROBE = 'PORT_PROBE'
+DNS_REQUEST = 'DNS_REQUEST'
+ID_PREFIX = 'aws-guard-duty'
+AWS_API_CALL = 'AWS_API_CALL'
+SOURCE = 'AWS GuardDuty findings'
+NETWORK_CONNECTION = 'NETWORK_CONNECTION'
 
 SOURCE_URI = \
     'https://console.aws.amazon.com/guardduty/home?' \
@@ -25,18 +36,22 @@ SEVERITY = RangeDict({
     range(1, 4): 'Low'
 })
 
-SENSOR = 'network.ips'
-SOURCE = 'AWS GuardDuty findings'
-
 DEFAULTS = {
     'confidence': CONFIDENCE,
     'source': SOURCE
 }
 
-NETWORK_CONNECTION = 'NETWORK_CONNECTION'
-PORT_PROBE = 'PORT_PROBE'
-DNS_REQUEST = 'DNS_REQUEST'
-AWS_API_CALL = 'AWS_API_CALL'
+COLUMNS_MAPPING = (
+    ("sensor name", "ServiceName"),
+    ("asn", "Asn"),
+    ("asn org", "AsnOrg"),
+    ("org", "Org"),
+    ("isp", "Isp"),
+    ("country", "CountryName"),
+    ("city", "CityName"),
+    ("local port", "Port"),
+    ("local port name", "PortName")
+)
 
 
 class Mapping:
@@ -45,23 +60,14 @@ class Mapping:
         self.finding = Finding(data)
         self.observable = Observable(**observable)
         self.aws_region = current_app.config['AWS_REGION']
-
-    @staticmethod
-    def _relation(source, type_, target):
-        source_type, source_value = source
-        target_type, target_value = target
-
-        if not source or not target:
-            return None
-
-        return ObservedRelation(
-            origin=SOURCE,
-            related=Observable(type=target_type,
-                               value=target_value),
-            relation=type_,
-            source=Observable(type=source_type,
-                              value=source_value)
+        self._session = Session(
+            external_id_prefix=ID_PREFIX,
+            source=SOURCE,
+            source_uri=self._source_uri(),
         )
+
+    def set_session(self):
+        return self._session.set()
 
     def _severity(self):
         return SEVERITY[int(self.finding.severity)]
@@ -85,14 +91,29 @@ class Mapping:
             yield Observable(type='ip', value=data.PublicIp)
             yield Observable(type='domain', value=data.PublicDnsName)
 
+    @staticmethod
+    def _relation(source, type_, target):
+        source_type, source_value = source
+        target_type, target_value = target
+
+        if not source or not target:
+            return None
+
+        return ObservedRelation(
+            origin=SOURCE,
+            related=Observable(type=target_type,
+                               value=target_value),
+            relation=type_,
+            source=Observable(type=source_type,
+                              value=source_value)
+        )
+
     def _relations(self):
         action_type = self.finding.service.action.type
         if action_type == NETWORK_CONNECTION:
-            source, target = self.finding.service.action.data.direction
+            source, target = self.finding.service.action.data.direction()
             yield self._relation(
-                ['ip', source.IpAddressV4],
-                'Connected_To',
-                ['ip', target.IpAddressV4]
+                ['ip', source], 'Connected_To', ['ip', target]
             )
 
     def _targets(self):
@@ -104,8 +125,24 @@ class Mapping:
             type=SENSOR
         )
 
+    def _data_table(self):
+        attrs = self.finding.service.attrs()
+        columns = []
+        rows = []
+
+        for key, value in COLUMNS_MAPPING:
+            if value in attrs.keys():
+                columns.append(ColumnDefinition(name=key, type='string'))
+                rows.append([attrs[value]])
+
+        return SightingDataTable(
+            columns=columns,
+            rows=rows
+        ).json
+
     def extract_sighting(self):
-        return Sighting(
+
+        sighting = Sighting(
             observables=[self.observable],
             title=self.finding.title,
             description=self.finding.description,
@@ -118,7 +155,14 @@ class Mapping:
             targets=[self._targets()],
             sensor=SENSOR,
             **DEFAULTS
-        ).json
+        )
+
+        if self.finding.service.action.type in [
+            NETWORK_CONNECTION,
+            PORT_PROBE
+        ]:
+            sighting.json['data'] = self._data_table()
+        return sighting
 
     def extract_indicator(self):
         start_time = self.finding.service.first_seen
@@ -131,4 +175,12 @@ class Mapping:
             source_uri=self._source_uri(),
             timestamp=start_time,
             **DEFAULTS
-        ).json
+        )
+
+    @staticmethod
+    def extract_relationship(source_ref, target_ref, type_):
+        return Relationship(
+            source_ref=source_ref,
+            target_ref=target_ref,
+            relationship_type=type_
+        )

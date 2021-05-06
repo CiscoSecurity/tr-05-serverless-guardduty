@@ -3,8 +3,8 @@ import json
 import requests
 
 from flask import request, jsonify, current_app, g
-from requests.exceptions import ConnectionError, InvalidURL, SSLError
 from api.errors import AuthorizationError, InvalidArgumentError
+from requests.exceptions import ConnectionError, InvalidURL, SSLError
 from jwt import InvalidSignatureError, DecodeError, InvalidAudienceError
 
 
@@ -144,6 +144,8 @@ def jsonify_result():
         result['data']['sightings'] = format_docs(g.sightings)
     if g.get('indicators'):
         result['data']['indicators'] = format_docs(g.indicators)
+    if g.get('relationships'):
+        result['data']['relationships'] = format_docs(g.relationships)
 
     if g.get('errors'):
         result['errors'] = g.errors
