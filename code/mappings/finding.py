@@ -81,8 +81,8 @@ class Finding(object):
                     local_ip = self.local_details['IpAddressV4']
                     remote_ip = self.remote_details['IpAddressV4']
                     directions = {
-                        INBOUND: [remote_ip, local_ip],
-                        OUTBOUND: [local_ip, remote_ip]
+                        INBOUND: [local_ip, remote_ip],
+                        OUTBOUND: [remote_ip, local_ip]
                     }
                     return directions[self.directing]
 
