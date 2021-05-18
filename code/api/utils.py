@@ -40,7 +40,8 @@ def get_public_key(jwks_host, token):
         ConnectionError: WRONG_JWKS_HOST,
         InvalidURL: WRONG_JWKS_HOST,
         KeyError: WRONG_JWKS_HOST,
-        SSLError: WRONG_JWKS_HOST
+        SSLError: WRONG_JWKS_HOST,
+        json.JSONDecodeError: WRONG_JWKS_HOST
     }
     try:
         response = requests.get(f"https://{jwks_host}/.well-known/jwks")
