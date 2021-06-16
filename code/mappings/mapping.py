@@ -171,7 +171,7 @@ class Mapping:
         start_time = self.finding.service.first_seen
 
         # Delete instance id and unnecessary space in indicator description.
-        description = re.sub(r"(i)-[0-9a-z]+", '', self.finding.description).replace('  ', ' ')
+        description = re.sub(r"(i)-[0-9a-z]+", "", self.finding.description).replace("  ", " ")
 
         return Indicator(
             producer=SENSOR,
