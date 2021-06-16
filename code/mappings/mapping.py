@@ -1,3 +1,5 @@
+import re
+
 from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
@@ -24,6 +26,7 @@ ID_PREFIX = 'aws-guard-duty'
 AWS_API_CALL = 'AWS_API_CALL'
 SOURCE = 'AWS GuardDuty findings'
 NETWORK_CONNECTION = 'NETWORK_CONNECTION'
+DEFAULT_VALID_END_DATE = '2525-01-01T00:00:00.000Z'
 
 SOURCE_URI = \
     'https://console.aws.amazon.com/guardduty/home?' \
@@ -166,11 +169,18 @@ class Mapping:
 
     def extract_indicator(self):
         start_time = self.finding.service.first_seen
+
+        # Delete instance id and unnecessary space in indicator description.
+        description = re.sub(r"(i)-[0-9a-z]+", '', self.finding.description).replace('  ', ' ')
+
         return Indicator(
             producer=SENSOR,
-            valid_time=ValidTime(start_time=start_time),
-            description=self.finding.description,
-            short_description=self.finding.description,
+            valid_time=ValidTime(
+                start_time=start_time,
+                end_time=DEFAULT_VALID_END_DATE
+            ),
+            description=description,
+            short_description=description,
             severity=self._severity(),
             source_uri=self._source_uri(),
             timestamp=start_time,
