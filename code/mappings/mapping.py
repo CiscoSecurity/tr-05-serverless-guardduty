@@ -28,10 +28,11 @@ SOURCE = "AWS GuardDuty findings"
 NETWORK_CONNECTION = "NETWORK_CONNECTION"
 DEFAULT_VALID_END_DATE = "2525-01-01T00:00:00.000Z"
 
-SOURCE_URI = \
-    "https://console.aws.amazon.com/guardduty/home?" \
-    "{region}/findings&region={region}#/findings?" \
+SOURCE_URI = (
+    "https://console.aws.amazon.com/guardduty/home?"
+    "{region}/findings&region={region}#/findings?"
     "macros=current&fId={finding_id}"
+)
 
 SEVERITY = RangeDict({
     range(7, 9): "High",
@@ -169,9 +170,12 @@ class Mapping:
 
     def extract_indicator(self):
         start_time = self.finding.service.first_seen
+        description = self.finding.description
 
-        # Delete instance id and unnecessary space in indicator description.
-        description = re.sub(r"(i)-[0-9a-z]+", "", self.finding.description).replace("  ", " ")
+        # Delete AWS instance id and
+        # unnecessary space in indicator description.
+        formated_description = \
+            re.sub(r"(i)-[0-9a-z]+", "", description).replace("  ", " ")
 
         return Indicator(
             producer=SENSOR,
@@ -179,8 +183,8 @@ class Mapping:
                 start_time=start_time,
                 end_time=DEFAULT_VALID_END_DATE
             ),
-            description=description,
-            short_description=description,
+            description=formated_description,
+            short_description=formated_description,
             severity=self._severity(),
             source_uri=self._source_uri(),
             timestamp=start_time,
