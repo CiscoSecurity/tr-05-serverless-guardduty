@@ -174,7 +174,7 @@ class Mapping:
 
         # Delete AWS instance id and
         # unnecessary space in indicator description.
-        formated_description = \
+        formatted_description = \
             re.sub(r"(i)-[0-9a-z]+", "", description).replace("  ", " ")
 
         return Indicator(
@@ -183,8 +183,8 @@ class Mapping:
                 start_time=start_time,
                 end_time=DEFAULT_VALID_END_DATE
             ),
-            description=formated_description,
-            short_description=formated_description,
+            description=formatted_description,
+            short_description=formatted_description,
             severity=self._severity(),
             source_uri=self._source_uri(),
             timestamp=start_time,
