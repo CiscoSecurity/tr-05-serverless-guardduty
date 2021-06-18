@@ -1,3 +1,5 @@
+import re
+
 from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
@@ -15,30 +17,32 @@ from bundlebuilder.models import (
     ColumnDefinition
 )
 
-CONFIDENCE = 'High'
-SIGHTING = 'sighting'
-SENSOR = 'network.ips'
-PORT_PROBE = 'PORT_PROBE'
-DNS_REQUEST = 'DNS_REQUEST'
-ID_PREFIX = 'aws-guard-duty'
-AWS_API_CALL = 'AWS_API_CALL'
-SOURCE = 'AWS GuardDuty findings'
-NETWORK_CONNECTION = 'NETWORK_CONNECTION'
+CONFIDENCE = "High"
+SIGHTING = "sighting"
+SENSOR = "network.ips"
+PORT_PROBE = "PORT_PROBE"
+DNS_REQUEST = "DNS_REQUEST"
+ID_PREFIX = "aws-guard-duty"
+AWS_API_CALL = "AWS_API_CALL"
+SOURCE = "AWS GuardDuty findings"
+NETWORK_CONNECTION = "NETWORK_CONNECTION"
+DEFAULT_VALID_END_DATE = "2525-01-01T00:00:00.000Z"
 
-SOURCE_URI = \
-    'https://console.aws.amazon.com/guardduty/home?' \
-    '{region}/findings&region={region}#/findings?' \
-    'macros=current&fId={finding_id}'
+SOURCE_URI = (
+    "https://console.aws.amazon.com/guardduty/home?"
+    "{region}/findings&region={region}#/findings?"
+    "macros=current&fId={finding_id}"
+)
 
 SEVERITY = RangeDict({
-    range(7, 9): 'High',
-    range(4, 7): 'Medium',
-    range(1, 4): 'Low'
+    range(7, 9): "High",
+    range(4, 7): "Medium",
+    range(1, 4): "Low"
 })
 
 DEFAULTS = {
-    'confidence': CONFIDENCE,
-    'source': SOURCE
+    "confidence": CONFIDENCE,
+    "source": SOURCE
 }
 
 COLUMNS_MAPPING = (
@@ -59,7 +63,7 @@ class Mapping:
     def __init__(self, data, **observable):
         self.finding = Finding(data)
         self.observable = Observable(**observable)
-        self.aws_region = current_app.config['AWS_REGION']
+        self.aws_region = current_app.config["AWS_REGION"]
         self._session = Session(
             external_id_prefix=ID_PREFIX,
             source=SOURCE,
@@ -88,8 +92,8 @@ class Mapping:
         interfaces = \
             self.finding.resource.details.interfaces
         for data in interfaces:
-            yield Observable(type='ip', value=data.PublicIp)
-            yield Observable(type='domain', value=data.PublicDnsName)
+            yield Observable(type="ip", value=data.PublicIp)
+            yield Observable(type="domain", value=data.PublicDnsName)
 
     @staticmethod
     def _relation(source, type_, target):
@@ -113,7 +117,7 @@ class Mapping:
         if action_type == NETWORK_CONNECTION:
             source, target = self.finding.service.action.data.direction()
             yield self._relation(
-                ['ip', source], 'Connected_To', ['ip', target]
+                ["ip", source], "Connected_To", ["ip", target]
             )
 
     def _targets(self):
@@ -132,7 +136,7 @@ class Mapping:
 
         for key, value in COLUMNS_MAPPING:
             if value in attrs.keys():
-                columns.append(ColumnDefinition(name=key, type='string'))
+                columns.append(ColumnDefinition(name=key, type="string"))
                 rows.append([attrs[value]])
 
         return SightingDataTable(
@@ -161,16 +165,26 @@ class Mapping:
             NETWORK_CONNECTION,
             PORT_PROBE
         ]:
-            sighting.json['data'] = self._data_table()
+            sighting.json["data"] = self._data_table()
         return sighting
 
     def extract_indicator(self):
         start_time = self.finding.service.first_seen
+        description = self.finding.description
+
+        # Delete AWS instance id and
+        # unnecessary space in indicator description.
+        formatted_description = \
+            re.sub(r"(i)-[0-9a-z]+", "", description).replace("  ", " ")
+
         return Indicator(
             producer=SENSOR,
-            valid_time=ValidTime(start_time=start_time),
-            description=self.finding.description,
-            short_description=self.finding.description,
+            valid_time=ValidTime(
+                start_time=start_time,
+                end_time=DEFAULT_VALID_END_DATE
+            ),
+            description=formatted_description,
+            short_description=formatted_description,
             severity=self._severity(),
             source_uri=self._source_uri(),
             timestamp=start_time,
