@@ -36,7 +36,8 @@ class GuardDutyDriver(object):
             try:
                 self.ctr_limit = int(current_app.config['CTR_ENTITIES_LIMIT'])
             except ValueError:
-                self.ctr_limit = current_app.config['DEFAULT_CTR_ENTITIES_LIMIT']
+                self.ctr_limit = \
+                    current_app.config['DEFAULT_CTR_ENTITIES_LIMIT']
             self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
 
         def get(self):
