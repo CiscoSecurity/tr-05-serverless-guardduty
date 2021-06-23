@@ -1,5 +1,3 @@
-import re
-
 from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
