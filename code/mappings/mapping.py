@@ -91,6 +91,9 @@ class Mapping:
             self.finding.resource.details.interfaces
         for data in interfaces:
             yield Observable(type="ip", value=data.PublicIp)
+            yield Observable(type="ip", value=data.PrivateIpAddress)
+            for ipv6_address in data.Ipv6Addresses:
+                yield Observable(type="ipv6", value=ipv6_address)
             yield Observable(type="domain", value=data.PublicDnsName)
 
     @staticmethod
@@ -146,6 +149,7 @@ class Mapping:
     def extract_sighting(self):
 
         sighting = Sighting(
+            internal=True,
             observables=[self.observable],
             title=self.finding.title,
             description=self.finding.description,
