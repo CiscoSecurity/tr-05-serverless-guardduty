@@ -8,7 +8,8 @@ IP_ATTRS = [
     "service.action.awsApiCallAction.remoteIpDetails.ipAddressV4",
     "service.action.networkConnectionAction.localIpDetails.ipAddressV4",
     "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4",
-    "resource.instanceDetails.networkInterfaces.privateIpAddresses.privateIpAddress"
+    "resource.instanceDetails.networkInterfaces.privateIpAddresses"
+    ".privateIpAddress"
 ]
 
 IPV6_ATTRS = [
