@@ -1,5 +1,3 @@
-import re
-
 from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
@@ -31,7 +29,7 @@ DEFAULT_VALID_END_DATE = "2525-01-01T00:00:00.000Z"
 SOURCE_URI = (
     "https://console.aws.amazon.com/guardduty/home?"
     "{region}/findings&region={region}#/findings?"
-    "macros=current&fId={finding_id}"
+    "macros=all&fId={finding_id}&search=id%3D{finding_id}"
 )
 
 SEVERITY = RangeDict({
@@ -137,11 +135,12 @@ class Mapping:
         for key, value in COLUMNS_MAPPING:
             if value in attrs.keys():
                 columns.append(ColumnDefinition(name=key, type="string"))
-                rows.append([attrs[value]])
+                rows.append(attrs[value])
 
         return SightingDataTable(
             columns=columns,
-            rows=rows
+            rows=[rows],
+            row_count=1
         ).json
 
     def extract_sighting(self):
@@ -172,19 +171,14 @@ class Mapping:
         start_time = self.finding.service.first_seen
         description = self.finding.description
 
-        # Delete AWS instance id and
-        # unnecessary space in indicator description.
-        formatted_description = \
-            re.sub(r"(i)-[0-9a-z]+", "", description).replace("  ", " ")
-
         return Indicator(
             producer=SENSOR,
             valid_time=ValidTime(
                 start_time=start_time,
                 end_time=DEFAULT_VALID_END_DATE
             ),
-            description=formatted_description,
-            short_description=formatted_description,
+            description=description,
+            short_description=description,
             severity=self._severity(),
             source_uri=self._source_uri(),
             timestamp=start_time,
