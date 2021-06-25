@@ -7,7 +7,9 @@ IP_ATTRS = [
     "resource.instanceDetails.networkInterfaces.publicIp",
     "service.action.awsApiCallAction.remoteIpDetails.ipAddressV4",
     "service.action.networkConnectionAction.localIpDetails.ipAddressV4",
-    "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4"
+    "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4",
+    "resource.instanceDetails.networkInterfaces.privateIpAddresses"
+    ".privateIpAddress"
 ]
 
 IPV6_ATTRS = [
@@ -50,13 +52,19 @@ class Observable(metaclass=ABCMeta):
         """Returns criteria."""
 
     @staticmethod
-    def refer(value: str) -> dict:
+    def refer(value: str, type_: str) -> dict:
         """Build an GuardDuty reference for the current observable."""
         url = current_app.config['GUARD_DUTY_REFER_URL']
+        types = {
+            'ip': 'IP',
+            'ipv6': 'IPv6'
+        }
+        human_readable_type_ = types[type_]
         return {
-            'id': f'ref-aws-detective-search-ip-{value}',
-            'title': 'Search for this IP',
-            'description': 'Check this IP with AWS Detective',
+            'id': f'ref-aws-detective-search-{type_}-{value}',
+            'title': f'Search for this {human_readable_type_}',
+            'description': f'Check this {human_readable_type_} '
+                           f'with AWS Detective',
             'url': url.format(region=current_app.config['AWS_REGION'],
                               observable=value),
             'categories': ['Search', 'AWS Detective'],
