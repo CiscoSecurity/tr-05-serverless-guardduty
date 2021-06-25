@@ -79,6 +79,6 @@ def refer_observables():
         if observable is None:
             continue
 
-        reference = observable.refer(value)
+        reference = observable.refer(value, type_)
         data.append(reference)
     return jsonify_data(data)

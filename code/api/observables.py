@@ -52,12 +52,16 @@ class Observable(metaclass=ABCMeta):
         """Returns criteria."""
 
     @staticmethod
-    def refer(value: str) -> dict:
+    def refer(value: str, type_: str) -> dict:
         """Build an GuardDuty reference for the current observable."""
         url = current_app.config['GUARD_DUTY_REFER_URL']
+        types = {
+            'ip': 'IP',
+            'ipv6': 'IPv6'
+        }
         return {
             'id': f'ref-aws-detective-search-ip-{value}',
-            'title': 'Search for this IP',
+            'title': f'Search for this {types[type_]}',
             'description': 'Check this IP with AWS Detective',
             'url': url.format(region=current_app.config['AWS_REGION'],
                               observable=value),
