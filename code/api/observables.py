@@ -59,10 +59,11 @@ class Observable(metaclass=ABCMeta):
             'ip': 'IP',
             'ipv6': 'IPv6'
         }
+        type_ = types[type_]
         return {
             'id': f'ref-aws-detective-search-ip-{value}',
-            'title': f'Search for this {types[type_]}',
-            'description': 'Check this IP with AWS Detective',
+            'title': f'Search for this {type_}',
+            'description': f'Check this {type_} with AWS Detective',
             'url': url.format(region=current_app.config['AWS_REGION'],
                               observable=value),
             'categories': ['Search', 'AWS Detective'],
