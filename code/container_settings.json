@@ -1,1 +1,4 @@
-{"VERSION": "1.0.0", "NAME": "GuardDuty"}
+{
+  "VERSION": "1.0.0",
+  "NAME": "GuardDuty"
+}
