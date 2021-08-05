@@ -10,7 +10,7 @@ from botocore.exceptions import (
 
 class GuardDutyDriver(object):
     """
-    Class for working with AWS GuardDuty resource
+    Class for working with Amazon GuardDuty resource
     """
 
     def __init__(self):
