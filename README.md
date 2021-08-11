@@ -2,7 +2,7 @@
 
 # GuardDuty Relay (Cisco Hosted)
 
-A Cisco SecureX Concrete Relay implementation using [AWS GuardDuty](https://aws.amazon.com/guardduty/) as a third-party Cyber Threat Intelligence service provider.
+A Cisco SecureX Concrete Relay implementation using [Amazon GuardDuty](https://aws.amazon.com/guardduty/) as a third-party Cyber Threat Intelligence service provider.
 
 The Relay itself is just a simple application written in Python that can be easily packaged and deployed.  This relay is now Cisco Hosted and no longer requires AWS Lambda.
 
@@ -94,7 +94,7 @@ This application was developed and tested under Python version 3.9.
 - `POST /refer/observables`
   - Accepts a list of observables and filters out unsupported ones.
   - Builds a search link per each supported observable to pivot back to the
-  [AWS Detective](https://aws.amazon.com/detective/) service and look up events with the observable there.
+  [Amazon Detective](https://aws.amazon.com/detective/) service and look up events with the observable there.
   - Returns a list of those links.
   
 - `POST /version`
@@ -107,7 +107,7 @@ This application was developed and tested under Python version 3.9.
 
 ### CTIM Mapping Specifics
 
-Each response from the AWS GuardDuty API for the supported observables generates the following CTIM entities:
+Each response from the Amazon GuardDuty API for the supported observables generates the following CTIM entities:
 
 - `Indicators` and `Sightings` are taken from each finding in response.
 - `Sightings` are based on `Findings`.
