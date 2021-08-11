@@ -94,7 +94,7 @@ This application was developed and tested under Python version 3.9.
 - `POST /refer/observables`
   - Accepts a list of observables and filters out unsupported ones.
   - Builds a search link per each supported observable to pivot back to the
-  [AWS Detective](https://aws.amazon.com/detective/) service and look up events with the observable there.
+  [Amazon Detective](https://aws.amazon.com/detective/) service and look up events with the observable there.
   - Returns a list of those links.
   
 - `POST /version`
