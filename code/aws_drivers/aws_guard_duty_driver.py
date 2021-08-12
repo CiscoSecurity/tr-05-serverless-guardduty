@@ -10,7 +10,7 @@ from botocore.exceptions import (
 
 class GuardDutyDriver(object):
     """
-    Class for working with AWS GuardDuty resource
+    Class for working with Amazon GuardDuty resource
     """
 
     def __init__(self):
@@ -35,7 +35,8 @@ class GuardDutyDriver(object):
             self.driver = root.driver
             try:
                 self.ctr_limit = int(current_app.config['CTR_ENTITIES_LIMIT'])
-            except ValueError:
+                assert self.ctr_limit > 0
+            except (ValueError, AssertionError):
                 self.ctr_limit = \
                     current_app.config['DEFAULT_CTR_ENTITIES_LIMIT']
             self.detector = current_app.config['AWS_GUARD_DUTY_DETECTOR_ID']
@@ -65,8 +66,12 @@ class GuardDutyDriver(object):
                             and finding not in self._findings:
                         self._findings.append(finding)
             except (BotoCoreError, ValueError, ClientError) as error:
+                if hasattr(error, 'operation_name'):
+                    if error.operation_name == 'ListFindings' and \
+                            error.response.get('Type') == 'InternalException':
+                        return []
                 raise GuardDutyError(error.args[0])
 
             next_token = response.get('NextToken')
-            if next_token and len(self._findings) < self.ctr_limit:
+            if next_token and (0 < len(self._findings) < self.ctr_limit):
                 self.list_by(criterion, limit - self.max_results, next_token)
