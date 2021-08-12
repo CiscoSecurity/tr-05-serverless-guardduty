@@ -64,10 +64,10 @@ class Observable(metaclass=ABCMeta):
             'id': f'ref-aws-detective-search-{type_}-{value}',
             'title': f'Search for this {human_readable_type_}',
             'description': f'Check this {human_readable_type_} '
-                           f'with AWS Detective',
+                           f'with Amazon Detective',
             'url': url.format(region=current_app.config['AWS_REGION'],
                               observable=value),
-            'categories': ['Search', 'AWS Detective'],
+            'categories': ['Search', 'Amazon Detective'],
         }
 
 
