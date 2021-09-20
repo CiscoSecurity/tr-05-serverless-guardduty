@@ -1,6 +1,6 @@
 from flask import Blueprint
 from api.client import GuardDuty
-from api.charts import ChartFactory
+from api.charts.factory import ChartFactory
 from api.utils import jsonify_data, get_jwt, get_json
 from api.schemas import DashboardTileSchema, DashboardTileDataSchema
 
@@ -26,9 +26,9 @@ def tile_data():
     _ = get_jwt()
     payload = get_json(DashboardTileDataSchema())
 
-    chart = ChartFactory().chart(payload['tile_id'])
+    chart = ChartFactory().get_chart(payload['tile_id'])
     client = GuardDuty()
-    client.findings.list_by(chart.criterion, unlimited=True)
+    client.findings.list_by(chart.criteria(payload['period']), unlimited=True)
     findings = client.findings.get()
     data = chart.build(findings)
 

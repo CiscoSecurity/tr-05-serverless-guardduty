@@ -1,6 +1,6 @@
 from functools import partial
 from flask import Blueprint, g
-from mappings.mapping import Mapping
+from api.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
 from api.client import GuardDuty
