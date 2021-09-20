@@ -96,6 +96,7 @@ class Finding(object):
                 self.interfaces = [
                     self.Interface(obj) for obj in data['NetworkInterfaces']
                 ]
+                self.instance_id = data['InstanceId']
 
             class Interface:
                 def __init__(self, data):
