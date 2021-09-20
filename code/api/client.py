@@ -1,6 +1,7 @@
 import boto3
 
 from flask import current_app
+from mappings.finding import Finding
 from api.errors import GuardDutyError
 from botocore.exceptions import (
     BotoCoreError,
@@ -8,7 +9,7 @@ from botocore.exceptions import (
 )
 
 
-class GuardDutyDriver(object):
+class GuardDuty(object):
     """
     Class for working with Amazon GuardDuty resource
     """
@@ -53,7 +54,8 @@ class GuardDutyDriver(object):
         def get(self):
             return self._findings
 
-        def list_by(self, criterion, limit=None, next_token=''):
+        def list_by(self, criterion, limit=None,
+                    next_token='', unlimited=False):
             try:
                 limit = self.ctr_limit if not limit else limit
 
@@ -73,7 +75,10 @@ class GuardDutyDriver(object):
                 for finding in findings:
                     if len(self._findings) < self.ctr_limit \
                             and finding not in self._findings:
-                        self._findings.append(finding)
+                        try:
+                            self._findings.append(Finding(finding))
+                        except KeyError:
+                            continue
             except (BotoCoreError, ValueError, ClientError) as error:
                 if hasattr(error, 'operation_name'):
                     if error.operation_name == 'ListFindings' and \
@@ -82,5 +87,6 @@ class GuardDutyDriver(object):
                 raise GuardDutyError(error.args[0])
 
             next_token = response.get('NextToken')
-            if next_token and (0 < len(self._findings) < self.ctr_limit):
+            if next_token and \
+                    (0 < len(self._findings) < self.ctr_limit or unlimited):
                 self.list_by(criterion, limit - self.max_results, next_token)
