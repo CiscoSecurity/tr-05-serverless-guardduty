@@ -1,46 +1,30 @@
-from abc import ABCMeta, abstractmethod
-from api.errors import TRFormattedError
+from datetime import datetime, timedelta
 
-
-INVALID_CHART_ID = "Invalid chart id"
-
-
-class ChartFactory:
-
-    @staticmethod
-    def chart(chart_id):
-        for cls in IChart.__subclasses__():
-            if cls.id() == chart_id:
-                return cls()
-        raise TRFormattedError(400, INVALID_CHART_ID)
-
-
-class IChart(metaclass=ABCMeta):
-
-    @staticmethod
-    @abstractmethod
-    def id():
-        """Returns id of specific type of chart."""
-
-    @abstractmethod
-    def criterion(self):
-        """Returns filter criterion for specific type of chart."""
-
-    @abstractmethod
-    def build(self, findings):
-        """Returns structure for specific type of chart."""
+from api.charts.factory import IChart
 
 
 class AffectedInstances(IChart):
+    PERIODS = {
+        "last_24_hours": 1,
+        "last_7_days": 7,
+        "last_30_days": 30
+    }
 
-    @property
-    def criterion(self):
+    def criterion(self, period):
+        date_format = "%d-%m-%Y"
+        date = (datetime.now().date() - timedelta(self.PERIODS[period]))
+        date = date.strftime(date_format)
+        date = int(datetime.strptime(date, date_format).strftime("%s"))
+
         return {
             "Criterion": {
                 "resource.resourceType": {
                     "Equals": [
                         "Instance"
                     ]
+                },
+                "updatedAt": {
+                    "Gt": date,
                 }
             }
         }
@@ -53,7 +37,10 @@ class AffectedInstances(IChart):
     def affected_iscs_id(findings):
         return list(
             set(
-                [finding.resource.details.instance_id for finding in findings]
+                [
+                    finding.resource.details.instance_id for finding
+                    in findings
+                ]
             )
         )
 
@@ -68,8 +55,8 @@ class AffectedInstances(IChart):
     @staticmethod
     def _sum_of_findings_by_isc(instance, findings):
         return sum(
-            finding.resource.details.instance_id == instance for finding in
-            findings
+            finding.resource.details.instance_id == instance for finding
+            in findings
         )
 
     def _segments(self, instance, findings):
@@ -93,11 +80,15 @@ class AffectedInstances(IChart):
         }
 
     def build(self, findings):
-
         return {
             "hide_legend": False,
+            "label_headers": [
+                "Affected instances",
+                "Finding types"
+            ],
             "labels": [
-                self.affected_iscs_id(findings), self.finding_types(findings)
+                self.affected_iscs_id(findings),
+                self.finding_types(findings)
             ],
             "data": [
                 self._data(instance, findings) for instance
