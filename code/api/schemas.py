@@ -1,4 +1,5 @@
 from marshmallow import ValidationError, Schema, fields, INCLUDE
+from marshmallow.validate import OneOf
 
 
 def validate_string(value):
@@ -47,7 +48,13 @@ class DashboardTileSchema(Schema):
 class DashboardTileDataSchema(Schema):
     period = fields.String(
         data_key='period',
-        validate=validate_string,
+        validate=OneOf(
+            [
+                "last_24_hours",
+                "last_7_days",
+                "last_30_days"
+            ]
+        ),
         required=True
     )
     tile_id = fields.String(
