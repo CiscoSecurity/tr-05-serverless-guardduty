@@ -1,4 +1,3 @@
-from .finding import Finding
 from flask import current_app
 from api.utils import RangeDict
 from bundlebuilder.session import Session
@@ -59,7 +58,7 @@ COLUMNS_MAPPING = (
 class Mapping:
 
     def __init__(self, data, **observable):
-        self.finding = Finding(data)
+        self.finding = data
         self.observable = Observable(**observable)
         self.aws_region = current_app.config["AWS_REGION"]
         self._session = Session(
