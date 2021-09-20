@@ -1,7 +1,8 @@
 import boto3
+import botocore
 
 from flask import current_app
-from mappings.finding import Finding
+from api.finding import Finding
 from api.errors import GuardDutyError
 from botocore.exceptions import (
     BotoCoreError,
@@ -18,9 +19,14 @@ class GuardDuty(object):
         self.region = str(current_app.config['AWS_REGION'])
         self.access_key = str(current_app.config['AWS_ACCESS_KEY_ID'])
         self.secret_key = str(current_app.config['AWS_SECRET_ACCESS_KEY'])
+        session_config = botocore.config.Config(
+            user_agent=current_app.config['USER_AGENT']
+        )
+
         try:
             self.driver = boto3.client(
                 'guardduty', self.region,
+                config=session_config,
                 aws_access_key_id=self.access_key,
                 aws_secret_access_key=self.secret_key
             )
@@ -39,6 +45,11 @@ class GuardDuty(object):
 
     class Finding:
 
+        DEFAULT_ORDER = {
+            'AttributeName': 'service.eventLastSeen',
+            'OrderBy': 'DESC'
+        }
+
         def __init__(self, root):
             self._findings = []
             self.max_results = 50
@@ -54,14 +65,15 @@ class GuardDuty(object):
         def get(self):
             return self._findings
 
-        def list_by(self, criterion, limit=None,
+        def list_by(self, criteria, order=None, limit=None,
                     next_token='', unlimited=False):
             try:
                 limit = self.ctr_limit if not limit else limit
 
                 response = self.driver.list_findings(
                     DetectorId=self.detector,
-                    FindingCriteria=criterion,
+                    FindingCriteria=criteria,
+                    SortCriteria=order or self.DEFAULT_ORDER,
                     MaxResults=limit if limit <= self.max_results
                     else self.max_results,
                     NextToken=next_token
@@ -89,4 +101,4 @@ class GuardDuty(object):
             next_token = response.get('NextToken')
             if next_token and \
                     (0 < len(self._findings) < self.ctr_limit or unlimited):
-                self.list_by(criterion, limit - self.max_results, next_token)
+                self.list_by(criteria, limit - self.max_results, next_token)
