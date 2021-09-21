@@ -11,7 +11,9 @@ dashboard_api = Blueprint('dashboard', __name__)
 @dashboard_api.route('/tiles', methods=['POST'])
 def tiles():
     _ = get_jwt()
-    return jsonify_data([])
+    charts = ChartFactory().list_charts()
+
+    return jsonify_data(charts)
 
 
 @dashboard_api.route('/tiles/tile', methods=['POST'])
@@ -28,8 +30,8 @@ def tile_data():
 
     chart = ChartFactory().get_chart(payload['tile_id'])
     client = GuardDuty()
-    client.findings.list_by(chart.criteria(payload['period']), unlimited=True)
-    findings = client.findings.get()
+    client.search(chart.criterion(payload['period']), unlimited=True)
+    findings = client.findings
     data = chart.build(findings)
 
     return jsonify_data(data)
