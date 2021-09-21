@@ -4,13 +4,14 @@
         "supported-apis": [
             "health",
             "observe/observables",
-            "refer/observables"
+            "refer/observables",
+            "tiles",
+            "tiles/tile-data"
         ],
         "url": "https://ciscohosted.url",
         "auth-type": "configuration-token",
         "configuration-token-alg": "RS256",
-        "custom_jwks_host": "visibility.amp.cisco.com",
-        "configuration-token-audience": "https://securex.us.security.cisco.com"
+        "custom_jwks_host": "visibility.amp.cisco.com"
     },
     "capabilities": [
         {
