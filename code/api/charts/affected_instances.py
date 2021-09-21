@@ -22,7 +22,8 @@ class AffectedInstances(IChart):
             "Affected Instances chart shows "
             "what types of findings EC2 instances have."
         )
-        self._short_description = "Affected Instances by finding types for given time period."
+        self._short_description = ("Affected Instances by finding types "
+                                   "for given time period.")
 
     @property
     def id(self):

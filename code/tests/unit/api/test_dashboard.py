@@ -24,25 +24,26 @@ def wrong_calls():
     )
     yield WrongCall(
         '/tiles/tile-data',
-        {'tile-id': 'some_value', 'period': 'some_period'},
+        {'tile-id': 'some_value', 'period': 'last_7_days'},
         "{'tile_id': ['Missing data for required field.'], "
         "'tile-id': ['Unknown field.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
-        {'tile_id': '', 'period': 'some_period'},
+        {'tile_id': '', 'period': 'last_7_days'},
         "{'tile_id': ['Field may not be blank.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
-        {'tile_id': 'some_value', 'not_period': 'some_period'},
+        {'tile_id': 'some_value', 'not_period': 'last_7_days'},
         "{'period': ['Missing data for required field.'], "
         "'not_period': ['Unknown field.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
         {'tile_id': 'some_value', 'period': ''},
-        "{'period': ['Field may not be blank.']}"
+        "{'period': ['Must be one of: "
+        "last_24_hours, last_7_days, last_30_days.']}"
     )
 
 
