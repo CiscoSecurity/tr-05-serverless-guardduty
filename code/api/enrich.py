@@ -35,9 +35,9 @@ def observe_observables():
         criteria = target.query(value)
 
         for criterion in criteria:
-            client.findings.list_by(criterion)
+            client.search(criterion)
 
-        findings = client.findings.get()
+        findings = client.findings
         for finding in findings:
             mapping = Mapping(finding, **observable)
             with mapping.set_session():
@@ -52,7 +52,7 @@ def observe_observables():
                         sighting, indicator, 'sighting-of'
                     )
                     g.relationships.append(relationship.json)
-                except KeyError:
+                except AttributeError:
                     continue
 
     return jsonify_result()
