@@ -22,8 +22,10 @@ class ChartFactory:
                 "id": cls.id,
                 "type": cls.type,
                 "title": cls.title,
+                "tags": cls.tags,
                 "description": cls.description,
-                "periods": cls.periods,
+                "short_description": cls.short_description,
+                "periods": list(cls.periods.keys()),
                 "default_period": cls.default_period
             }
         return [chart(cls.__call__()) for cls in IChart.__subclasses__()]
@@ -43,6 +45,11 @@ class IChart(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def tags(self):
+        """Returns chart tags."""
+
+    @property
+    @abstractmethod
     def title(self):
         """Returns chart title."""
 
@@ -50,6 +57,11 @@ class IChart(metaclass=ABCMeta):
     @abstractmethod
     def description(self):
         """Returns chart description."""
+
+    @property
+    @abstractmethod
+    def short_description(self):
+        """Returns chart short description."""
 
     @property
     @abstractmethod
