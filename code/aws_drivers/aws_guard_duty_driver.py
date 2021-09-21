@@ -27,6 +27,15 @@ class GuardDutyDriver(object):
             raise GuardDutyError(error.args[0])
         self.findings = self.Finding(self)
 
+    def health(self):
+        try:
+            response = self.driver.get_detector(
+                DetectorId=self.findings.detector
+            )
+        except (BotoCoreError, ValueError, ClientError) as error:
+            raise GuardDutyError(error.args[0])
+        return response
+
     class Finding:
 
         def __init__(self, root):
