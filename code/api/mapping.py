@@ -13,6 +13,7 @@ from bundlebuilder.models import (
     SightingDataTable,
     ColumnDefinition
 )
+from types import SimpleNamespace
 
 CONFIDENCE = "High"
 SIGHTING = "sighting"
@@ -71,23 +72,23 @@ class Mapping:
         return self._session.set()
 
     def _severity(self):
-        return SEVERITY[int(self.finding.severity)]
+        return SEVERITY[int(self.finding.Severity)]
 
     def _source_uri(self):
         return SOURCE_URI.format(
-            region=self.aws_region, finding_id=self.finding.id
+            region=self.aws_region, finding_id=self.finding.Id
         )
 
     def _observed_time(self):
-        start_date = self.finding.service.first_seen
-        end_date = self.finding.service.last_seen
+        start_date = self.finding.Service.EventFirstSeen
+        end_date = self.finding.Service.EventLastSeen
 
         return ObservedTime(start_time=start_date,
                             end_time=end_date)
 
     def _observables(self):
         interfaces = \
-            self.finding.resource.details.interfaces
+            self.finding.Resource.InstanceDetails.NetworkInterfaces
         for data in interfaces:
             yield Observable(type="ip", value=data.PublicIp)
             yield Observable(type="ip", value=data.PrivateIpAddress)
@@ -113,9 +114,17 @@ class Mapping:
         )
 
     def _relations(self):
-        action_type = self.finding.service.action.type
+        action_type = self.finding.Service.Action.ActionType
         if action_type == NETWORK_CONNECTION:
-            source, target = self.finding.service.action.data.direction()
+            action = self.finding.Service.Action.NetworkConnectionAction
+            local_ip = action.LocalIpDetails.IpAddressV4
+            remote_ip = action.RemoteIpDetails.IpAddressV4
+            directions = {
+                "INBOUND": [remote_ip, local_ip],
+                "OUTBOUND": [local_ip, remote_ip]
+            }
+            direction = action.ConnectionDirection
+            source, target = directions[direction]
             yield self._relation(
                 ["ip", source], "Connected_To", ["ip", target]
             )
@@ -129,15 +138,31 @@ class Mapping:
             type=SENSOR
         )
 
+    def _data(self):
+        action = self.finding.Service.Action
+        action_key = action.ActionType.replace("_", " ")
+        action_key = action_key.title().replace(" ", "") + "Action"
+        action_data = getattr(
+            action,
+            action_key
+        )
+        remote_data = action_data.RemoteIpDetails.Organization
+        local_data = action_data.LocalPortDetails
+        return SimpleNamespace(
+            **remote_data.__dict__,
+            **local_data.__dict__,
+            **{"ServiceName": self.finding.Service.ServiceName}
+        )
+
     def _data_table(self):
-        attrs = self.finding.service.attrs()
+        attrs = self._data()
         columns = []
         rows = []
 
         for key, value in COLUMNS_MAPPING:
-            if value in attrs.keys():
+            if value in [attr for attr in dir(attrs) if "__" not in attr]:
                 columns.append(ColumnDefinition(name=key, type="string"))
-                rows.append(attrs[value])
+                rows.append(getattr(attrs, value))
 
         return SightingDataTable(
             columns=columns,
@@ -150,12 +175,12 @@ class Mapping:
         sighting = Sighting(
             internal=True,
             observables=[self.observable],
-            title=self.finding.title,
-            description=self.finding.description,
+            title=self.finding.Title,
+            description=self.finding.Description,
             observed_time=self._observed_time(),
             source_uri=self._source_uri(),
-            timestamp=self.finding.service.last_seen,
-            count=self.finding.service.count,
+            timestamp=self.finding.Service.EventLastSeen,
+            count=self.finding.Service.Count,
             severity=self._severity(),
             relations=[x for x in self._relations() if x],
             targets=[self._targets()],
@@ -163,7 +188,7 @@ class Mapping:
             **DEFAULTS
         )
 
-        if self.finding.service.action.type in [
+        if self.finding.Service.Action.ActionType in [
             NETWORK_CONNECTION,
             PORT_PROBE
         ]:
@@ -171,8 +196,8 @@ class Mapping:
         return sighting
 
     def extract_indicator(self):
-        start_time = self.finding.service.first_seen
-        description = self.finding.description
+        start_time = self.finding.Service.EventFirstSeen
+        description = self.finding.Description
 
         return Indicator(
             producer=SENSOR,
