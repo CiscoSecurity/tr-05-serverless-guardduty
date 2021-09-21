@@ -1,9 +1,9 @@
 from flask import Blueprint
+from datetime import datetime
 from api.client import GuardDuty
 from api.charts.factory import ChartFactory
 from api.utils import jsonify_data, get_jwt, get_json
 from api.schemas import DashboardTileSchema, DashboardTileDataSchema
-
 
 dashboard_api = Blueprint('dashboard', __name__)
 
@@ -30,8 +30,28 @@ def tile_data():
 
     chart = ChartFactory().get_chart(payload['tile_id'])
     client = GuardDuty()
-    client.search(chart.criterion(payload['period']), unlimited=True)
+    criteria = chart.criterion(payload['period'])
+    client.search(criteria, unlimited=True)
     findings = client.findings
-    data = chart.build(findings)
 
-    return jsonify_data(data)
+    end_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    start_time = datetime.utcfromtimestamp(
+        criteria["Criterion"]["updatedAt"]["Gt"]
+    )
+    start_time = start_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+    return jsonify_data(
+        {
+            **chart.build(findings),
+            **{
+                "observed_time": {
+                    "start_time": start_time,
+                    "end_time": end_time
+                },
+                "valid_time": {
+                    "start_time": start_time,
+                    "end_time": end_time
+                }
+            }
+        }
+    )

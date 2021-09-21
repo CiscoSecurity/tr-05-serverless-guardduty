@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
-
 from api.charts.factory import IChart
+
+from datetime import datetime, timedelta
 
 
 class AffectedInstances(IChart):
@@ -9,6 +9,9 @@ class AffectedInstances(IChart):
         self._type = "donut_graph"
         self._id = "affected_instances"
         self._title = "Affected instances"
+        self._tags = [
+            "affected_instances"
+        ]
         self._periods = {
             "last_24_hours": 1,
             "last_7_days": 7,
@@ -19,6 +22,7 @@ class AffectedInstances(IChart):
             "Affected Instances chart shows "
             "what types of findings EC2 instances have."
         )
+        self._short_description = "Affected Instances by finding types for given time period."
 
     @property
     def id(self):
@@ -29,12 +33,20 @@ class AffectedInstances(IChart):
         return self._type
 
     @property
+    def tags(self):
+        return self._tags
+
+    @property
     def title(self):
         return self._title
 
     @property
     def description(self):
         return self._description
+
+    @property
+    def short_description(self):
+        return self._short_description
 
     @property
     def periods(self):
@@ -110,6 +122,7 @@ class AffectedInstances(IChart):
         }
 
     def build(self, findings):
+
         return {
             "hide_legend": False,
             "label_headers": [
@@ -120,6 +133,7 @@ class AffectedInstances(IChart):
                 self.affected_iscs_id(findings),
                 self.finding_types(findings)
             ],
+            "cache_scope": "none",
             "data": [
                 self._data(instance, findings) for instance
                 in self.affected_iscs_id(findings)
