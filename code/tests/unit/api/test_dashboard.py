@@ -19,17 +19,6 @@ WrongCall = namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
 
 def wrong_calls():
     yield WrongCall(
-        '/tiles/tile',
-        {'tile-id': 'some_value'},
-        "{'tile_id': ['Missing data for required field.'], "
-        "'tile-id': ['Unknown field.']}"
-    )
-    yield WrongCall(
-        '/tiles/tile',
-        {'tile_id': ''},
-        "{'tile_id': ['Field may not be blank.']}"
-    )
-    yield WrongCall(
         '/tiles/tile-data',
         {'tile-id': 'some_value', 'period': 'last_7_days'},
         "{'tile_id': ['Missing data for required field.'], "
@@ -98,7 +87,6 @@ def test_dashboard_call_with_wrong_payload(mock_request,
 
 def routes():
     yield '/tiles'
-    yield '/tiles/tile'
     yield '/tiles/tile-data'
 
 

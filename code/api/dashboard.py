@@ -5,7 +5,7 @@ from flask import Blueprint
 from api.client import GuardDuty
 from api.charts.factory import ChartFactory
 from api.utils import jsonify_data, get_jwt, get_json
-from api.schemas import DashboardTileSchema, DashboardTileDataSchema
+from api.schemas import DashboardTileDataSchema
 
 dashboard_api = Blueprint('dashboard', __name__)
 
@@ -16,13 +16,6 @@ def tiles():
     charts = ChartFactory().list_charts()
 
     return jsonify_data(charts)
-
-
-@dashboard_api.route('/tiles/tile', methods=['POST'])
-def tile():
-    _ = get_jwt()
-    _ = get_json(DashboardTileSchema())
-    return jsonify_data({})
 
 
 @dashboard_api.route('/tiles/tile-data', methods=['POST'])

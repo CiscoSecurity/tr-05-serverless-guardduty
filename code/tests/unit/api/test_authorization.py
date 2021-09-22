@@ -24,7 +24,6 @@ def routes():
     yield '/observe/observables'
     yield '/refer/observables'
     yield '/tiles'
-    yield '/tiles/tile'
     yield '/tiles/tile-data'
 
 
