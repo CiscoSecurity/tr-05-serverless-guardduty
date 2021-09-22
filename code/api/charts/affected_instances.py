@@ -1,6 +1,6 @@
-from api.charts.factory import IChart
-
 from datetime import datetime, timedelta
+
+from api.charts.factory import IChart
 
 
 class AffectedInstances(IChart):
@@ -71,8 +71,10 @@ class AffectedInstances(IChart):
     @staticmethod
     def finding_types(findings):
         return list(
-            set(
-                [finding.Type for finding in findings]
+            sorted(
+                set(
+                    [finding.Type for finding in findings]
+                )
             )
         )
 

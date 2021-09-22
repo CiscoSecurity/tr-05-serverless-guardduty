@@ -1,5 +1,7 @@
+from types import SimpleNamespace
+
 from flask import current_app
-from api.utils import RangeDict
+
 from bundlebuilder.session import Session
 from bundlebuilder.models import (
     Observable,
@@ -13,7 +15,8 @@ from bundlebuilder.models import (
     SightingDataTable,
     ColumnDefinition
 )
-from types import SimpleNamespace
+
+from api.utils import RangeDict
 
 CONFIDENCE = "High"
 SIGHTING = "sighting"

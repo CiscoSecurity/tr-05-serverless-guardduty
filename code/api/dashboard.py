@@ -1,5 +1,7 @@
-from flask import Blueprint
 from datetime import datetime
+
+from flask import Blueprint
+
 from api.client import GuardDuty
 from api.charts.factory import ChartFactory
 from api.utils import jsonify_data, get_jwt, get_json

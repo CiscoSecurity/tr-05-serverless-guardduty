@@ -1,5 +1,10 @@
-from marshmallow import ValidationError, Schema, fields, INCLUDE
 from marshmallow.validate import OneOf
+from marshmallow import (
+    ValidationError,
+    Schema,
+    fields,
+    INCLUDE
+)
 
 
 def validate_string(value):

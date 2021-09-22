@@ -1,6 +1,7 @@
-from flask import current_app
-from abc import ABCMeta, abstractmethod
 from typing import Optional
+from abc import ABCMeta, abstractmethod
+
+from flask import current_app
 
 
 IP_ATTRS = [

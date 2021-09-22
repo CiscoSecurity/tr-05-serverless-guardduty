@@ -1,7 +1,7 @@
-from collections import namedtuple
-from http import HTTPStatus
-
 from pytest import fixture
+
+from http import HTTPStatus
+from collections import namedtuple
 
 
 Call = namedtuple('Call', ('method', 'route', 'expected_status_code'))
