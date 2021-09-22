@@ -1,5 +1,7 @@
 from functools import partial
+
 from flask import Blueprint, g
+
 from api.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema

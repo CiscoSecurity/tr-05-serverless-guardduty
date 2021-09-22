@@ -1,14 +1,14 @@
 import json
 import boto3
 import botocore
+from types import SimpleNamespace
 
 from flask import current_app
-from types import SimpleNamespace
-from api.errors import GuardDutyError
 from botocore.exceptions import (
     BotoCoreError,
     ClientError
 )
+from api.errors import GuardDutyError
 
 
 def serialize(obj):

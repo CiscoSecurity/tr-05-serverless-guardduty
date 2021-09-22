@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
+
 from api.errors import TRFormattedError
 
 
 INVALID_CHART_ID = "Invalid chart id"
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 
 class ChartFactory:

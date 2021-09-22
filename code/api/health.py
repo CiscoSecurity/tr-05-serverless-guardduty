@@ -1,4 +1,5 @@
 from flask import Blueprint
+
 from api.utils import get_jwt, jsonify_data
 from api.client import GuardDuty
 
