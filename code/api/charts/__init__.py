@@ -1,1 +1,1 @@
-from .affected_instances import AffectedInstances
+from .affected_instances import AffectedInstances  # noqa: F401
