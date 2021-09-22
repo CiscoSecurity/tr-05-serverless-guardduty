@@ -1,27 +1,29 @@
+from datetime import datetime
+
 EXPECTED_RESPONSE_OF_JWKS_ENDPOINT = {
-  'keys': [
-    {
-      'kty': 'RSA',
-      'n': 'tSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM-XjNmLfU1M74N0V'
-           'mdzIX95sneQGO9kC2xMIE-AIlt52Yf_KgBZggAlS9Y0Vx8DsSL2H'
-           'vOjguAdXir3vYLvAyyHin_mUisJOqccFKChHKjnk0uXy_38-1r17'
-           '_cYTp76brKpU1I4kM20M__dbvLBWjfzyw9ehufr74aVwr-0xJfsB'
-           'Vr2oaQFww_XHGz69Q7yHK6DbxYO4w4q2sIfcC4pT8XTPHo4JZ2M7'
-           '33Ea8a7HxtZS563_mhhRZLU5aynQpwaVv2U--CL6EvGt8TlNZOke'
-           'Rv8wz-Rt8B70jzoRpVK36rR-pHKlXhMGT619v82LneTdsqA25Wi2'
-           'Ld_c0niuul24A6-aaj2u9SWbxA9LmVtFntvNbRaHXE1SLpLPoIp8'
-           'uppGF02Nz2v3ld8gCnTTWfq_BQ80Qy8e0coRRABECZrjIMzHEg6M'
-           'loRDy4na0pRQv61VogqRKDU2r3_VezFPQDb3ciYsZjWBr3HpNOkU'
-           'jTrvLmFyOE9Q5R_qQGmc6BYtfk5rn7iIfXlkJAZHXhBy-ElBuiBM'
-           '-YSkFM7dH92sSIoZ05V4MP09Xcppx7kdwsJy72Sust9Hnd9B7V35'
-           'YnVF6W791lVHnenhCJOziRmkH4xLLbPkaST2Ks3IHH7tVltM6NsR'
-           'k3jNdVM',
-      'e': 'AQAB',
-      'alg': 'RS256',
-      'kid': '02B1174234C29F8EFB69911438F597FF3FFEE6B7',
-      'use': 'sig'
-    }
-  ]
+    'keys': [
+        {
+            'kty': 'RSA',
+            'n': 'tSKfSeI0fukRIX38AHlKB1YPpX8PUYN2JdvfM-XjNmLfU1M74N0V'
+                 'mdzIX95sneQGO9kC2xMIE-AIlt52Yf_KgBZggAlS9Y0Vx8DsSL2H'
+                 'vOjguAdXir3vYLvAyyHin_mUisJOqccFKChHKjnk0uXy_38-1r17'
+                 '_cYTp76brKpU1I4kM20M__dbvLBWjfzyw9ehufr74aVwr-0xJfsB'
+                 'Vr2oaQFww_XHGz69Q7yHK6DbxYO4w4q2sIfcC4pT8XTPHo4JZ2M7'
+                 '33Ea8a7HxtZS563_mhhRZLU5aynQpwaVv2U--CL6EvGt8TlNZOke'
+                 'Rv8wz-Rt8B70jzoRpVK36rR-pHKlXhMGT619v82LneTdsqA25Wi2'
+                 'Ld_c0niuul24A6-aaj2u9SWbxA9LmVtFntvNbRaHXE1SLpLPoIp8'
+                 'uppGF02Nz2v3ld8gCnTTWfq_BQ80Qy8e0coRRABECZrjIMzHEg6M'
+                 'loRDy4na0pRQv61VogqRKDU2r3_VezFPQDb3ciYsZjWBr3HpNOkU'
+                 'jTrvLmFyOE9Q5R_qQGmc6BYtfk5rn7iIfXlkJAZHXhBy-ElBuiBM'
+                 '-YSkFM7dH92sSIoZ05V4MP09Xcppx7kdwsJy72Sust9Hnd9B7V35'
+                 'YnVF6W791lVHnenhCJOziRmkH4xLLbPkaST2Ks3IHH7tVltM6NsR'
+                 'k3jNdVM',
+            'e': 'AQAB',
+            'alg': 'RS256',
+            'kid': '02B1174234C29F8EFB69911438F597FF3FFEE6B7',
+            'use': 'sig'
+        }
+    ]
 }
 
 RESPONSE_OF_JWKS_ENDPOINT_WITH_WRONG_KEY = {
@@ -101,3 +103,154 @@ nKyI8B5gw4C0G0iL1dSsz2bR1O4GNOVfT3R6joZEXATFo/Kc2L0YAvApBNUYvY0k
 bjJ/JfTO5060SsWftf4iw3jrhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGR
 mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 -----END RSA PRIVATE KEY-----"""
+
+TILES_RESPONSE = {
+    "data": [
+        {
+            "default_period": "last_7_days",
+            "description": ("Affected Instances chart shows what"
+                            " types of findings EC2 instances have."),
+            "id": "affected_instances",
+            "periods": [
+                "last_24_hours",
+                "last_7_days",
+                "last_30_days"
+            ],
+            "short_description": ("Affected Instances by finding "
+                                  "types for given time period."),
+            "tags": [
+                "affected_instances"
+            ],
+            "title": "Affected instances",
+            "type": "donut_graph"
+        }
+    ]
+}
+
+
+def guard_duty_response():
+    return [
+        {
+            'AccountId': 'id',
+            'Arn': 'arn:aws:guardduty:us-east-2:id:detector/detector_id/finding'
+                   '/0ebd952561ab229930385cfe43860cbf',
+            'CreatedAt': '2021-08-09T09:42:27.926Z',
+            'Description': 'EC2 instance i-99999999 is querying a domain name of a remote host that is a known '
+                           'source of Drive-By download attacks.',
+            'Id': '0ebd952561ab229930385cfe43860cbf', 'Partition': 'aws', 'Region': 'us-east-2', 'Resource': {
+            'InstanceDetails': {'AvailabilityZone': 'GeneratedFindingInstaceAvailabilityZone',
+                                'IamInstanceProfile': {'Arn': 'arn:aws:iam::id:example/instance/profile',
+                                                       'Id': 'GeneratedFindingInstanceProfileId'},
+                                'ImageDescription': 'GeneratedFindingInstaceImageDescription',
+                                'ImageId': 'ami-99999999', 'InstanceId': 'i-99999999', 'InstanceState': 'running',
+                                'InstanceType': 'm3.xlarge',
+                                'OutpostArn': 'arn:aws:outposts:us-west-2:id:outpost/op-0fbc006e9abbc73c3',
+                                'LaunchTime': '2016-07-16T15:55:03.000Z', 'NetworkInterfaces': [
+                    {'Ipv6Addresses': [], 'NetworkInterfaceId': 'eni-bfcffe88',
+                     'PrivateDnsName': 'GeneratedFindingPrivateDnsName', 'PrivateIpAddress': '10.0.0.1',
+                     'PrivateIpAddresses': [
+                         {'PrivateDnsName': 'GeneratedFindingPrivateName', 'PrivateIpAddress': '10.0.0.1'}],
+                     'PublicDnsName': 'GeneratedFindingPublicDNSName', 'PublicIp': '198.51.100.0', 'SecurityGroups': [
+                        {'GroupId': 'GeneratedFindingSecurityId', 'GroupName': 'GeneratedFindingSecurityGroupName'}],
+                     'SubnetId': 'GeneratedFindingSubnetId', 'VpcId': 'GeneratedFindingVPCId'}], 'ProductCodes': [{}],
+                                'Tags': [
+                                    {'Key': 'GeneratedFindingInstaceTag1', 'Value': 'GeneratedFindingInstaceValue1'},
+                                    {'Key': 'GeneratedFindingInstaceTag2', 'Value': 'GeneratedFindingInstaceTagValue2'},
+                                    {'Key': 'GeneratedFindingInstaceTag3', 'Value': 'GeneratedFindingInstaceTagValue3'},
+                                    {'Key': 'GeneratedFindingInstaceTag4', 'Value': 'GeneratedFindingInstaceTagValue4'},
+                                    {'Key': 'GeneratedFindingInstaceTag5', 'Value': 'GeneratedFindingInstaceTagValue5'},
+                                    {'Key': 'GeneratedFindingInstaceTag6', 'Value': 'GeneratedFindingInstaceTagValue6'},
+                                    {'Key': 'GeneratedFindingInstaceTag7', 'Value': 'GeneratedFindingInstaceTagValue7'},
+                                    {'Key': 'GeneratedFindingInstaceTag8', 'Value': 'GeneratedFindingInstaceTagValue8'},
+                                    {'Key': 'GeneratedFindingInstaceTag9',
+                                     'Value': 'GeneratedFindingInstaceTagValue9'}]}, 'ResourceType': 'Instance'},
+            'SchemaVersion': '2.0', 'Service': {
+            'Action': {'ActionType': 'DNS_REQUEST', 'DnsRequestAction': {'Domain': 'GeneratedFindingDomainName'}},
+            'Evidence': {'ThreatIntelligenceDetails': [
+                {'ThreatListName': 'GeneratedFindingThreatListName', 'ThreatNames': ['GeneratedFindingThreatName']}]},
+            'Archived': False, 'Count': 3, 'DetectorId': 'detector_id',
+            'EventFirstSeen': '2021-08-09T09:42:27.000Z', 'EventLastSeen': '2021-09-20T14:24:35.000Z',
+            'ResourceRole': 'TARGET', 'ServiceName': 'guardduty'}, 'Severity': 8,
+            'Title': 'Drive-by source domain name queried by EC2 instance i-99999999.',
+            'Type': 'Trojan:EC2/DriveBySourceTraffic!DNS', 'UpdatedAt': '2021-09-20T14:24:35.130Z'},
+        {
+            'AccountId': 'id',
+            'Arn': 'arn:aws:guardduty:us-east-2:id:detector/detector_id/finding/14bd952561ab40e0b9275f648fcca0f2',
+            'CreatedAt': '2021-08-09T09:42:27.926Z',
+            'Description': 'EC2 instance i-99999999 is querying a domain name associated with a known Command & '
+                           'Control server.',
+            'Id': '14bd952561ab40e0b9275f648fcca0f2', 'Partition': 'aws', 'Region': 'us-east-2', 'Resource': {
+            'InstanceDetails': {'AvailabilityZone': 'GeneratedFindingInstaceAvailabilityZone',
+                                'IamInstanceProfile': {'Arn': 'arn:aws:iam::id:example/instance/profile',
+                                                       'Id': 'GeneratedFindingInstanceProfileId'},
+                                'ImageDescription': 'GeneratedFindingInstaceImageDescription',
+                                'ImageId': 'ami-99999999', 'InstanceId': 'i-99999999', 'InstanceState': 'running',
+                                'InstanceType': 'c3.large',
+                                'OutpostArn': 'arn:aws:outposts:us-west-2:id:outpost/op-0fbc006e9abbc73c3',
+                                'LaunchTime': '2017-12-19T01:37:35.000Z', 'NetworkInterfaces': [
+                    {'Ipv6Addresses': [], 'NetworkInterfaceId': 'eni-bfcffe88',
+                     'PrivateDnsName': 'GeneratedFindingPrivateDnsName', 'PrivateIpAddress': '10.0.0.1',
+                     'PrivateIpAddresses': [
+                         {'PrivateDnsName': 'GeneratedFindingPrivateName', 'PrivateIpAddress': '10.0.0.1'}],
+                     'PublicDnsName': 'GeneratedFindingPublicDNSName', 'PublicIp': '198.51.100.0',
+                     'SecurityGroups': [{'GroupId': 'GeneratedFindingSecurityId',
+                                         'GroupName': 'GeneratedFindingSecurityGroupName'}],
+                     'SubnetId': 'GeneratedFindingSubnetId', 'VpcId': 'GeneratedFindingVPCId'}],
+                                'ProductCodes': [{}], 'Tags': [
+                    {'Key': 'GeneratedFindingInstaceTag1', 'Value': 'GeneratedFindingInstaceValue1'},
+                    {'Key': 'GeneratedFindingInstaceTag2', 'Value': 'GeneratedFindingInstaceTagValue2'},
+                    {'Key': 'GeneratedFindingInstaceTag3', 'Value': 'GeneratedFindingInstaceTagValue3'},
+                    {'Key': 'GeneratedFindingInstaceTag4', 'Value': 'GeneratedFindingInstaceTagValue4'},
+                    {'Key': 'GeneratedFindingInstaceTag5', 'Value': 'GeneratedFindingInstaceTagValue5'},
+                    {'Key': 'GeneratedFindingInstaceTag6', 'Value': 'GeneratedFindingInstaceTagValue6'},
+                    {'Key': 'GeneratedFindingInstaceTag7', 'Value': 'GeneratedFindingInstaceTagValue7'},
+                    {'Key': 'GeneratedFindingInstaceTag8', 'Value': 'GeneratedFindingInstaceTagValue8'},
+                    {'Key': 'GeneratedFindingInstaceTag9', 'Value': 'GeneratedFindingInstaceTagValue9'}]},
+            'ResourceType': 'Instance'}, 'SchemaVersion': '2.0', 'Service': {
+            'Action': {'ActionType': 'DNS_REQUEST', 'DnsRequestAction': {'Domain': 'GeneratedFindingDomainName'}},
+            'Evidence': {'ThreatIntelligenceDetails': [{'ThreatListName': 'GeneratedFindingThreatListName',
+                                                        'ThreatNames': ['GeneratedFindingThreatName']}]},
+            'Archived': False, 'Count': 3, 'DetectorId': 'detector_id',
+            'EventFirstSeen': '2021-08-09T09:42:27.000Z', 'EventLastSeen': '2021-09-20T14:24:35.000Z',
+            'ResourceRole': 'TARGET', 'ServiceName': 'guardduty'}, 'Severity': 8,
+            'Title': 'Command and Control server domain name queried by EC2 instance i-99999999.',
+            'Type': 'Backdoor:EC2/C&CActivity.B!DNS', 'UpdatedAt': '2021-09-20T14:24:35.130Z'
+        }
+    ]
+
+
+AFFECTED_INSTANCES_CRITERIA = {
+    "Criterion": {
+        "resource.resourceType": {
+            "Equals": [
+                "Instance"
+            ]
+        },
+        "updatedAt": {
+            "Gt": 1631653200,
+        }
+    }
+}
+
+
+def tile_data_response():
+    end_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    start_time = datetime.utcfromtimestamp(
+        AFFECTED_INSTANCES_CRITERIA["Criterion"]["updatedAt"]["Gt"]
+    )
+    start_time = start_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+    return {'data': {'cache_scope': 'none',
+                     'data': [{'key': 0,
+                               'segments': [{'key': 0, 'value': 1},
+                                            {'key': 1, 'value': 1}],
+                               'value': 2}],
+                     'hide_legend': False,
+                     'label_headers': ['Affected instances', 'Finding types'],
+                     'labels': [['i-99999999'],
+                                ['Backdoor:EC2/C&CActivity.B!DNS',
+                                 'Trojan:EC2/DriveBySourceTraffic!DNS']],
+                     'observed_time': {'end_time': end_time,
+                                       'start_time': start_time},
+                     'valid_time': {'end_time': end_time,
+                                    'start_time': start_time}}}
