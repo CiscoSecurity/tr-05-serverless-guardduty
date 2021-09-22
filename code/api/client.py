@@ -75,9 +75,9 @@ class GuardDuty(object):
     @findings.setter
     def findings(self, values):
         for value in values:
-            if len(self.findings) < self.ctr_limit:
-                if value not in self.findings:
-                    self.findings.append(serialize(value))
+            if len(self.findings) < self.ctr_limit and \
+                    value not in self.findings:
+                self.findings.append(serialize(value))
 
     @staticmethod
     def _set_ctr_limit(limit):
@@ -124,10 +124,10 @@ class GuardDuty(object):
             MaxResults=limit if limit <= self.max_results
             else self.max_results
         )
-        if self._token:
-            if 0 < len(self._findings) < self.ctr_limit or unlimited:
-                limit = limit - self.max_results
-                self.search(criteria=criteria, limit=limit)
+        if self._token and \
+                (0 < len(self._findings) < self.ctr_limit or unlimited):
+            limit = limit - self.max_results
+            self.search(criteria=criteria, limit=limit)
 
     def health(self):
         try:
