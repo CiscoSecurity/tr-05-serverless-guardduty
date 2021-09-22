@@ -1,5 +1,5 @@
 {
-    "description": "AWS Guard Duty integration provides threat intelligence feeds, such as lists of malicious IP addresses and domains, and machine learning to identify unexpected and potentially unauthorized and malicious activity within your AWS environment. When you search for an observable in Amazon GuardDuty, it investigates it in AWS Detective.\n\n This integration allows you to query IPv4 and IPv6 data types and it returns indicators and sightings.",
+    "description": "Amazon Guard Duty integration provides threat intelligence feeds, such as lists of malicious IP addresses and domains, and machine learning to identify unexpected and potentially unauthorized and malicious activity within your AWS environment. When you search for an observable in Amazon GuardDuty, it investigates it in Amazon Detective.\n\n This integration allows you to query IPv4 and IPv6 data types and it returns indicators and sightings.",
     "properties": {
         "supported-apis": [
             "health",
