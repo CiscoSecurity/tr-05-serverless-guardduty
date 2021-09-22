@@ -1,2 +1,2 @@
 [flake8]
-exclude = */payloads_for_tests.py, venv
+exclude = venv
