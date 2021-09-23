@@ -75,9 +75,10 @@ class GuardDuty(object):
     @findings.setter
     def findings(self, values):
         for value in values:
+            value = serialize(value)
             if len(self.findings) < self.ctr_limit and \
                     value not in self.findings:
-                self.findings.append(serialize(value))
+                self.findings.append(value)
 
     @staticmethod
     def _set_ctr_limit(limit):

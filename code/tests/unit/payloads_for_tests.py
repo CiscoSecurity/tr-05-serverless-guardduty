@@ -127,6 +127,322 @@ TILES_RESPONSE = {
     ]
 }
 
+AFFECTED_INSTANCES_CRITERIA = {
+    "Criterion": {
+        "resource.resourceType": {
+            "Equals": [
+                "Instance"
+            ]
+        },
+        "updatedAt": {
+            "Gt": 1631653200,
+        }
+    }
+}
+
+OBSERVE_RESPONSE = {
+    "data": {
+        "indicators": {
+            "count": 2,
+            "docs": [
+                {
+                    "confidence": "High",
+                    "description": "EC2 instance i-99999999 is "
+                                   "querying a domain name of a "
+                                   "remote host that is a "
+                                   "known source "
+                                   "of Drive-By download attacks.",
+                    "external_ids": [
+                        "aws-guard-duty-indicator-31b81b20c7d6b9d"
+                        "add40c06eb8bf1ad079c7e4f96d2be00660f6da9"
+                        "b82421335"
+                    ],
+                    "id": "transient:aws-guard-duty-indicator-"
+                          "f001da94620f4d2e8f0fe6d29629e618",
+                    "producer": "network.ips",
+                    "schema_version": "1.0.17",
+                    "severity": "High",
+                    "short_description": "EC2 instance i-99999999 "
+                                         "is querying a domain "
+                                         "name of a remote host that "
+                                         "is a known "
+                                         "source of Drive-By "
+                                         "download attacks.",
+                    "source": "Amazon GuardDuty findings",
+                    "source_uri": "https://console.aws.amazon.com"
+                                  "/guardduty/home?region/"
+                                  "findings&region=region"
+                                  "#/findings?macros"
+                                  "=all&fId=0ebd952561ab2299"
+                                  "30385cfe43860cbf&search=id"
+                                  "%3D0ebd952561ab229930385c"
+                                  "fe43860cbf",
+                    "timestamp": "2021-08-09T09:42:27.000Z",
+                    "type": "indicator",
+                    "valid_time": {
+                        "end_time": "2525-01-01T00:00:00.000Z",
+                        "start_time": "2021-08-09T09:42:27.000Z"
+                    }
+                },
+                {
+                    "confidence": "High",
+                    "description": "EC2 instance i-99999999 is "
+                                   "querying a domain name "
+                                   "associated with a known "
+                                   "Command & Control "
+                                   "server.",
+                    "external_ids": [
+                        "aws-guard-duty-indicator-"
+                        "31b81b20c7d6b9dadd40c06eb8bf1ad079c7"
+                        "e4f96d2be00660f6da9b82421335"
+                    ],
+                    "id": "transient:aws-guard-duty-"
+                          "indicator-88c24095ae564d57"
+                          "95cc3f08992e5898",
+                    "producer": "network.ips",
+                    "schema_version": "1.0.17",
+                    "severity": "High",
+                    "short_description": "EC2 instance i-99999999 "
+                                         "is querying a domain "
+                                         "name associated with a "
+                                         "known Command & "
+                                         "Control server.",
+                    "source": "Amazon GuardDuty findings",
+                    "source_uri": "https://console.aws.amazon.com/"
+                                  "guardduty/home?region/findings&"
+                                  "region=region"
+                                  "#/findings?macros"
+                                  "=all&fId=14bd952561ab40e0b927"
+                                  "5f648fcca0f2&search=id"
+                                  "%3D14bd952561ab40e0b9275f648fcca0f2",
+                    "timestamp": "2021-08-09T09:42:27.000Z",
+                    "type": "indicator",
+                    "valid_time": {
+                        "end_time": "2525-01-01T00:00:00.000Z",
+                        "start_time": "2021-08-09T09:42:27.000Z"
+                    }
+                }
+            ]
+        },
+        "relationships": {
+            "count": 2,
+            "docs": [
+                {
+                    "external_ids": [
+                        "aws-guard-duty-relationship"
+                        "-cac4274d6cb2ca0a2ed7d35f93d1ccbb607"
+                        "13e8b5a451ff62b572c12a75e0151"
+                    ],
+                    "id": "transient:aws-guard-duty-relationship"
+                          "-08c0d67d19e5483998953246c094fe0d",
+                    "relationship_type": "sighting-of",
+                    "schema_version": "1.0.17",
+                    "source": "Amazon GuardDuty findings",
+                    "source_ref": "transient:aws-guard-duty-"
+                                  "sighting-099065c8932f41e2908"
+                                  "3ed7a742cb644",
+                    "source_uri": "https://console.aws.amazon.com/"
+                                  "guardduty/home?region/"
+                                  "findings&region=region"
+                                  "#/findings?macros"
+                                  "=all&fId=0ebd952561ab22993038"
+                                  "5cfe43860cbf&search=id"
+                                  "%3D0ebd952561ab229930385cfe"
+                                  "43860cbf",
+                    "target_ref": "transient:aws-guard-duty-"
+                                  "indicator-f001da94620f4d2e8f0"
+                                  "fe6d29629e618",
+                    "type": "relationship"
+                },
+                {
+                    "external_ids": [
+                        "aws-guard-duty-relationship"
+                        "-cac4274d6cb2ca0a2ed7d35f93d1ccbb60713"
+                        "e8b5a451ff62b572c12a75e0151"
+                    ],
+                    "id": "transient:aws-guard-duty-relationship"
+                          "-10774be950d74376bc1bd90a98e89d21",
+                    "relationship_type": "sighting-of",
+                    "schema_version": "1.0.17",
+                    "source": "Amazon GuardDuty findings",
+                    "source_ref": "transient:aws-guard-duty-"
+                                  "sighting-bc0af638cea2466cb"
+                                  "74e34d4dcd3fc4b",
+                    "source_uri": "https://console.aws.amazon.com/"
+                                  "guardduty/home?region/findings"
+                                  "&region=region"
+                                  "#/findings?macros"
+                                  "=all&fId=14bd952561ab40e0b92"
+                                  "75f648fcca0f2&search=id"
+                                  "%3D14bd952561ab40e0b9275f648f"
+                                  "cca0f2",
+                    "target_ref": "transient:aws-guard-duty-"
+                                  "indicator-88c24095ae564d5795"
+                                  "cc3f08992e5898",
+                    "type": "relationship"
+                }
+            ]
+        },
+        "sightings": {
+            "count": 2,
+            "docs": [
+                {
+                    "confidence": "High",
+                    "count": 3,
+                    "description": "EC2 instance i-99999999 is "
+                                   "querying a domain name of "
+                                   "a remote host that is a "
+                                   "known source "
+                                   "of Drive-By download attacks.",
+                    "external_ids": [
+                        "aws-guard-duty-sighting-7a830ab68800aff"
+                        "6a15e61294b41a4e07d177c495f49ee808d232"
+                        "e719e5a34bd"
+                    ],
+                    "id": "transient:aws-guard-duty-sighting-"
+                          "099065c8932f41e29083ed7a742cb644",
+                    "internal": True,
+                    "observables": [
+                        {
+                            "type": "ip",
+                            "value": "10.0.0.1"
+                        }
+                    ],
+                    "observed_time": {
+                        "end_time": "2021-09-20T14:24:35.000Z",
+                        "start_time": "2021-08-09T09:42:27.000Z"
+                    },
+                    "relations": [],
+                    "schema_version": "1.0.17",
+                    "sensor": "network.ips",
+                    "severity": "High",
+                    "source": "Amazon GuardDuty findings",
+                    "source_uri": "https://console.aws.amazon.com/"
+                                  "guardduty/home?region/findings"
+                                  "&region=region"
+                                  "#/findings?macros=all&fId="
+                                  "0ebd952561ab229930385cfe43860cb"
+                                  "f&search=id"
+                                  "%3D0ebd952561ab229930385cfe43"
+                                  "860cbf",
+                    "targets": [
+                        {
+                            "observables": [
+                                {
+                                    "type": "ip",
+                                    "value": "198.51.100.0"
+                                },
+                                {
+                                    "type": "ip",
+                                    "value": "10.0.0.1"
+                                },
+                                {
+                                    "type": "domain",
+                                    "value": "GeneratedFindingPu"
+                                             "blicDNSName"
+                                }
+                            ],
+                            "observed_time": {
+                                "end_time": "2021-09-20T14:24:35.000Z",
+                                "start_time": "2021-08-09T09:42:27.000Z"
+                            },
+                            "type": "network.ips"
+                        }
+                    ],
+                    "timestamp": "2021-09-20T14:24:35.000Z",
+                    "title": "Drive-by source domain name queried "
+                             "by EC2 instance i-99999999.",
+                    "type": "sighting"
+                },
+                {
+                    "confidence": "High",
+                    "count": 3,
+                    "description": "EC2 instance i-99999999 is "
+                                   "querying a domain name "
+                                   "associated with a known "
+                                   "Command & Control "
+                                   "server.",
+                    "external_ids": [
+                        "aws-guard-duty-sighting-0732a5b0377c7e"
+                        "48d57e23f71c193220902192eb21c7d52159"
+                        "fd819c9c4dc228"
+                    ],
+                    "id": "transient:aws-guard-duty-sighting-"
+                          "bc0af638cea2466cb74e34d4dcd3fc4b",
+                    "internal": True,
+                    "observables": [
+                        {
+                            "type": "ip",
+                            "value": "10.0.0.1"
+                        }
+                    ],
+                    "observed_time": {
+                        "end_time": "2021-09-20T14:24:35.000Z",
+                        "start_time": "2021-08-09T09:42:27.000Z"
+                    },
+                    "relations": [],
+                    "schema_version": "1.0.17",
+                    "sensor": "network.ips",
+                    "severity": "High",
+                    "source": "Amazon GuardDuty findings",
+                    "source_uri": "https://console.aws.amazon.com/"
+                                  "guardduty/home?region/findings"
+                                  "&region=region"
+                                  "#/findings?macros=all&fId="
+                                  "14bd952561ab40e0b9275f648"
+                                  "fcca0f2&search=id"
+                                  "%3D14bd952561ab40e0b9275f"
+                                  "648fcca0f2",
+                    "targets": [
+                        {
+                            "observables": [
+                                {
+                                    "type": "ip",
+                                    "value": "198.51.100.0"
+                                },
+                                {
+                                    "type": "ip",
+                                    "value": "10.0.0.1"
+                                },
+                                {
+                                    "type": "domain",
+                                    "value": "GeneratedFind"
+                                             "ingPublicDNSName"
+                                }
+                            ],
+                            "observed_time": {
+                                "end_time": "2021-09-20T14:24:35.000Z",
+                                "start_time": "2021-08-09T09:42:27.000Z"
+                            },
+                            "type": "network.ips"
+                        }
+                    ],
+                    "timestamp": "2021-09-20T14:24:35.000Z",
+                    "title": "Command and Control server domain "
+                             "name queried by EC2 instance i-99999999.",
+                    "type": "sighting"
+                }
+            ]
+        }
+    }
+}
+
+REFER_RESPONSE = {
+    "data": [
+        {
+            "categories": [
+                "Search",
+                "Amazon Detective"
+            ],
+            "description": "Check this IP with Amazon Detective",
+            "id": "ref-aws-detective-search-ip-10.0.0.1",
+            "title": "Search for this IP",
+            "url": "https://region.console.aws.amazon.com/"
+                   "detective/home?region=region#entities/IpAddress/10.0.0.1"
+        }
+    ]
+}
+
 
 def guard_duty_response():
     return [
@@ -394,20 +710,6 @@ def guard_duty_response():
             "UpdatedAt": "2021-09-20T14:24:35.130Z"
         }
     ]
-
-
-AFFECTED_INSTANCES_CRITERIA = {
-    "Criterion": {
-        "resource.resourceType": {
-            "Equals": [
-                "Instance"
-            ]
-        },
-        "updatedAt": {
-            "Gt": 1631653200,
-        }
-    }
-}
 
 
 def tile_data_response():
