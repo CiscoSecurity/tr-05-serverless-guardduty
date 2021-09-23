@@ -229,9 +229,9 @@ OBSERVE_RESPONSE = {
             "docs": [
                 {
                     "external_ids": [
-                        "aws-guard-duty-relationship"
-                        "-cac4274d6cb2ca0a2ed7d35f93d1ccbb607"
-                        "13e8b5a451ff62b572c12a75e0151"
+                        "aws-guard-duty-relationship-"
+                        "198e4e9957b34070f57e69942dd2"
+                        "c751c72e5dfd41e7ab2ac47f4b26766d7a69"
                     ],
                     "id": "transient:aws-guard-duty-relationship"
                           "-08c0d67d19e5483998953246c094fe0d",
@@ -256,9 +256,9 @@ OBSERVE_RESPONSE = {
                 },
                 {
                     "external_ids": [
-                        "aws-guard-duty-relationship"
-                        "-cac4274d6cb2ca0a2ed7d35f93d1ccbb60713"
-                        "e8b5a451ff62b572c12a75e0151"
+                        "aws-guard-duty-relationship-"
+                        "198e4e9957b34070f57e69942dd2"
+                        "c751c72e5dfd41e7ab2ac47f4b26766d7a69"
                     ],
                     "id": "transient:aws-guard-duty-relationship"
                           "-10774be950d74376bc1bd90a98e89d21",
