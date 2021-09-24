@@ -1,7 +1,10 @@
 from http import HTTPStatus
-from tests.unit.api.utils import get_headers
 from unittest.mock import patch
 from collections import namedtuple
+
+from pytest import fixture
+
+from tests.unit.api.utils import get_headers
 from api.errors import INVALID_ARGUMENT
 from tests.unit.conftest import mock_api_response
 from tests.unit.payloads_for_tests import (
@@ -11,8 +14,6 @@ from tests.unit.payloads_for_tests import (
     tile_data_response,
     guard_duty_response
 )
-
-from pytest import fixture
 
 
 WrongCall = namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
