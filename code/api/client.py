@@ -1,13 +1,14 @@
 import json
-import boto3
-import botocore
 from types import SimpleNamespace
 
+import boto3
+import botocore
 from flask import current_app
 from botocore.exceptions import (
     BotoCoreError,
     ClientError
 )
+
 from api.errors import GuardDutyError
 
 
