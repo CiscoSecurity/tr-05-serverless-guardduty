@@ -1,7 +1,7 @@
 from http import HTTPStatus
+from unittest.mock import patch
 
 from pytest import fixture
-from unittest.mock import patch
 
 from tests.unit.api.utils import get_headers
 from tests.unit.conftest import mock_api_response
