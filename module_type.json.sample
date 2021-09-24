@@ -8,7 +8,7 @@
             "tiles",
             "tiles/tile-data"
         ],
-        "url": "http://cc90-188-163-108-220.ngrok.io",
+        "url": "https://ciscohosted.url",
         "auth-type": "configuration-token",
         "configuration-token-alg": "RS256",
         "custom_jwks_host": "visibility.amp.cisco.com"
