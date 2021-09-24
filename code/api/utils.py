@@ -1,7 +1,7 @@
-import jwt
 import json
-import requests
 
+import jwt
+import requests
 from flask import request, jsonify, current_app, g
 from requests.exceptions import ConnectionError, InvalidURL, SSLError
 from jwt import InvalidSignatureError, DecodeError, InvalidAudienceError

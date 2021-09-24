@@ -1,6 +1,7 @@
-from pytest import fixture
-from http import HTTPStatus
 from unittest.mock import patch
+from http import HTTPStatus
+
+from pytest import fixture
 from requests.exceptions import ConnectionError, InvalidURL
 
 from tests.unit.api.utils import get_headers

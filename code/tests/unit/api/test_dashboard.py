@@ -1,6 +1,7 @@
 from pytest import fixture
+
 from http import HTTPStatus
-from .utils import get_headers
+from tests.unit.api.utils import get_headers
 from unittest.mock import patch
 from collections import namedtuple
 from api.errors import INVALID_ARGUMENT
