@@ -1,11 +1,9 @@
-from datetime import datetime, timedelta
-
-from api.charts.factory import IChart
+from api.charts.factory import IChart, DEFAULT_PERIOD
 
 
 class AffectedInstances(IChart):
 
-    def __init__(self):
+    def __init__(self, period=DEFAULT_PERIOD):
         self._type = "donut_graph"
         self._id = "affected_instances"
         self._title = "Affected instances"
@@ -17,7 +15,7 @@ class AffectedInstances(IChart):
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self._default_period = "last_7_days"
+        self.days = self.periods[period]
         self._description = (
             "Affected Instances chart shows "
             "what types of findings EC2 instances have."
@@ -52,10 +50,6 @@ class AffectedInstances(IChart):
     @property
     def periods(self):
         return self._periods
-
-    @property
-    def default_period(self):
-        return self._default_period
 
     @staticmethod
     def affected_iscs_id(findings):
@@ -105,40 +99,35 @@ class AffectedInstances(IChart):
             "segments": self._segments(instance, findings)
         }
 
-    def criterion(self, period):
-        date_format = "%d-%m-%Y"
-        days = timedelta(self.periods.get(period, self.default_period))
-        date = (datetime.now().date() - days).strftime(date_format)
-        date = int(datetime.strptime(date, date_format).strftime("%s"))
-
-        return {
-            "Criterion": {
+    def criterion(self):
+        criterion = super(AffectedInstances, self).criterion()
+        criterion["Criterion"].update(
+            {
                 "resource.resourceType": {
                     "Equals": [
                         "Instance"
                     ]
-                },
-                "updatedAt": {
-                    "Gt": date,
                 }
             }
-        }
+        )
+        return criterion
 
     def build(self, findings):
-
-        return {
-            "hide_legend": False,
-            "label_headers": [
-                "Affected instances",
-                "Finding types"
-            ],
-            "labels": [
-                self.affected_iscs_id(findings),
-                self.finding_types(findings)
-            ],
-            "cache_scope": "none",
-            "data": [
-                self._data(instance, findings) for instance
-                in self.affected_iscs_id(findings)
-            ]
-        }
+        build = super(AffectedInstances, self).build()
+        build.update(
+            {
+                "label_headers": [
+                    "Affected instances",
+                    "Finding types"
+                ],
+                "labels": [
+                    self.affected_iscs_id(findings),
+                    self.finding_types(findings)
+                ],
+                "data": [
+                    self._data(instance, findings) for instance
+                    in self.affected_iscs_id(findings)
+                ]
+            }
+        )
+        return build
