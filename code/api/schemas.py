@@ -1,4 +1,10 @@
-from marshmallow import ValidationError, Schema, fields, INCLUDE
+from marshmallow.validate import OneOf
+from marshmallow import (
+    ValidationError,
+    Schema,
+    fields,
+    INCLUDE
+)
 
 
 def validate_string(value):
@@ -36,18 +42,16 @@ class ActionFormParamsSchema(Schema):
         unknown = INCLUDE
 
 
-class DashboardTileSchema(Schema):
-    tile_id = fields.String(
-        data_key='tile_id',
-        validate=validate_string,
-        required=True
-    )
-
-
 class DashboardTileDataSchema(Schema):
     period = fields.String(
         data_key='period',
-        validate=validate_string,
+        validate=OneOf(
+            [
+                "last_24_hours",
+                "last_7_days",
+                "last_30_days"
+            ]
+        ),
         required=True
     )
     tile_id = fields.String(

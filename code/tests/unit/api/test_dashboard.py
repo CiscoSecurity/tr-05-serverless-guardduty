@@ -1,48 +1,47 @@
-from pytest import fixture
 from http import HTTPStatus
-from .utils import get_headers
 from unittest.mock import patch
 from collections import namedtuple
+
+from pytest import fixture
+
+from tests.unit.api.utils import get_headers
 from api.errors import INVALID_ARGUMENT
-from ..conftest import mock_api_response
-from ..payloads_for_tests import EXPECTED_RESPONSE_OF_JWKS_ENDPOINT
+from tests.unit.conftest import mock_api_response
+from tests.unit.payloads_for_tests import (
+    EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
+    TILES_RESPONSE,
+    AFFECTED_INSTANCES_CRITERIA,
+    tile_data_response,
+    guard_duty_response
+)
+
 
 WrongCall = namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
 
 
 def wrong_calls():
     yield WrongCall(
-        '/tiles/tile',
-        {'tile-id': 'some_value'},
-        "{'tile_id': ['Missing data for required field.'], "
-        "'tile-id': ['Unknown field.']}"
-    )
-    yield WrongCall(
-        '/tiles/tile',
-        {'tile_id': ''},
-        "{'tile_id': ['Field may not be blank.']}"
-    )
-    yield WrongCall(
         '/tiles/tile-data',
-        {'tile-id': 'some_value', 'period': 'some_period'},
+        {'tile-id': 'some_value', 'period': 'last_7_days'},
         "{'tile_id': ['Missing data for required field.'], "
         "'tile-id': ['Unknown field.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
-        {'tile_id': '', 'period': 'some_period'},
+        {'tile_id': '', 'period': 'last_7_days'},
         "{'tile_id': ['Field may not be blank.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
-        {'tile_id': 'some_value', 'not_period': 'some_period'},
+        {'tile_id': 'some_value', 'not_period': 'last_7_days'},
         "{'period': ['Missing data for required field.'], "
         "'not_period': ['Unknown field.']}"
     )
     yield WrongCall(
         '/tiles/tile-data',
         {'tile_id': 'some_value', 'period': ''},
-        "{'period': ['Field may not be blank.']}"
+        "{'period': ['Must be one of: "
+        "last_24_hours, last_7_days, last_30_days.']}"
     )
 
 
@@ -74,7 +73,6 @@ def invalid_argument_expected_payload():
 def test_dashboard_call_with_wrong_payload(mock_request,
                                            wrong_call, client, valid_jwt,
                                            invalid_argument_expected_payload):
-
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
 
@@ -91,7 +89,6 @@ def test_dashboard_call_with_wrong_payload(mock_request,
 
 def routes():
     yield '/tiles'
-    yield '/tiles/tile'
     yield '/tiles/tile-data'
 
 
@@ -100,6 +97,28 @@ def route(request):
     return request.param
 
 
-def test_dashboard_call_success(route, client, valid_jwt):
-    response = client.post(route, headers=get_headers(valid_jwt()))
-    assert response.status_code == HTTPStatus.OK
+@fixture(scope='module')
+def valid_json():
+    return {"period": "last_7_days", "tile_id": "affected_instances"}
+
+
+@patch('requests.get')
+@patch('api.client.GuardDuty._look_up_for_data')
+@patch('api.charts.AffectedInstances.criterion')
+def test_dashboard_call_success(mock_criteria, mock_data, mock_request,
+                                route, client, valid_jwt,
+                                valid_json):
+    mock_request.return_value = \
+        mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
+    if route == '/tiles':
+        response = client.post(route, headers=get_headers(valid_jwt()))
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == TILES_RESPONSE
+    if route == '/tiles/tile-data':
+        mock_data.return_value = guard_duty_response()
+        mock_criteria.return_value = AFFECTED_INSTANCES_CRITERIA
+        response = client.post(
+            route, headers=get_headers(valid_jwt()), json=valid_json
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == tile_data_response()

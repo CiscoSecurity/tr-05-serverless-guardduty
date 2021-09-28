@@ -1,17 +1,21 @@
-from pytest import fixture
-from http import HTTPStatus
-from .utils import get_headers
 from unittest.mock import patch
+from http import HTTPStatus
+
+from pytest import fixture
+from requests.exceptions import ConnectionError, InvalidURL
+
+from tests.unit.api.utils import get_headers
 from api.errors import AUTH_ERROR
-from ..conftest import mock_api_response
+from tests.unit.conftest import mock_api_response
 from api.utils import (
     WRONG_PAYLOAD_STRUCTURE,
     WRONG_KEY,
     WRONG_AUDIENCE,
     KID_NOT_FOUND,
-    JWKS_HOST_MISSING
+    JWKS_HOST_MISSING,
+    WRONG_JWKS_HOST
 )
-from ..payloads_for_tests import (
+from tests.unit.payloads_for_tests import (
     EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
     RESPONSE_OF_JWKS_ENDPOINT_WITH_WRONG_KEY
 )
@@ -22,7 +26,6 @@ def routes():
     yield '/observe/observables'
     yield '/refer/observables'
     yield '/tiles'
-    yield '/tiles/tile'
     yield '/tiles/tile-data'
 
 
@@ -173,3 +176,21 @@ def test_call_with_missing_jwks_host(
     assert response.json == authorization_errors_expected_payload(
         JWKS_HOST_MISSING
     )
+
+
+@patch('requests.get')
+def test_call_with_wrong_jwks_host(
+        mock_request, route, client, valid_jwt,
+        authorization_errors_expected_payload
+):
+    for error in (ConnectionError, InvalidURL):
+        mock_request.side_effect = error()
+
+        response = client.post(
+            route, headers=get_headers(valid_jwt())
+        )
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json == authorization_errors_expected_payload(
+            WRONG_JWKS_HOST
+        )
