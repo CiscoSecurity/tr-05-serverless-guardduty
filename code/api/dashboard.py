@@ -23,15 +23,15 @@ def tile_data():
     _ = get_jwt()
     payload = get_json(DashboardTileDataSchema())
 
-    chart = ChartFactory().get_chart(payload['tile_id'])
+    chart = ChartFactory().get_chart(payload['tile_id'], payload['period'])
     client = GuardDuty()
-    criteria = chart.criterion(payload['period'])
+    criteria = chart.criterion()
     client.search(criteria, unlimited=True)
     findings = client.findings
 
     end_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    start_time = datetime.utcfromtimestamp(
-        criteria["Criterion"]["updatedAt"]["Gt"]
+    start_time = datetime.fromtimestamp(
+        criteria["Criterion"]["updatedAt"]["Gt"]/1000.0
     )
     start_time = start_time.strftime("%Y-%m-%dT%H:%M:%S")
 
