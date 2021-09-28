@@ -1,19 +1,21 @@
 from abc import ABCMeta, abstractmethod
+from datetime import timedelta, datetime
 
 from api.errors import TRFormattedError
 
 
 INVALID_CHART_ID = "Invalid chart id"
+DEFAULT_PERIOD = "last_7_days"
 
 
 class ChartFactory:
 
     @staticmethod
-    def get_chart(chart_id):
+    def get_chart(chart_id, period):
 
         for cls in IChart.__subclasses__():
             if cls.__call__().id == chart_id:
-                return cls()
+                return cls(period)
         raise TRFormattedError(400, INVALID_CHART_ID)
 
     @staticmethod
@@ -33,6 +35,10 @@ class ChartFactory:
 
 
 class IChart(metaclass=ABCMeta):
+
+    @abstractmethod
+    def __init__(self, days):
+        self.days = days
 
     @property
     @abstractmethod
@@ -69,11 +75,28 @@ class IChart(metaclass=ABCMeta):
     def periods(self):
         """Returns chart available periods to represent data."""
 
+    @property
+    def default_period(self):
+        """Returns chart available periods to represent data."""
+        return DEFAULT_PERIOD
+
     @staticmethod
-    @abstractmethod
+    def build():
+        """Returns chart data."""
+        return {
+            "hide_legend": False,
+            "cache_scope": "none"
+        }
+
     def criterion(self):
         """Returns chart filter criteria."""
+        days = timedelta(self.days)
+        date = int((datetime.utcnow() - days).timestamp() * 1000)
 
-    @abstractmethod
-    def build(self, findings):
-        """Returns chart data."""
+        return {
+            "Criterion": {
+                "updatedAt": {
+                    "Gt": date,
+                }
+            }
+        }
