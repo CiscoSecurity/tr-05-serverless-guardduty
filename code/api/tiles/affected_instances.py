@@ -1,7 +1,7 @@
-from api.charts.factory import IChart, DEFAULT_PERIOD
+from api.tiles.factory import ITile, DEFAULT_PERIOD
 
 
-class AffectedInstances(IChart):
+class AffectedInstances(ITile):
 
     def __init__(self, period=DEFAULT_PERIOD):
         self._type = "donut_graph"
@@ -15,7 +15,7 @@ class AffectedInstances(IChart):
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self.days = self.periods[period]
+        self.period = period
         self._description = (
             "Affected Instances chart shows "
             "what types of findings EC2 instances have."
@@ -99,8 +99,8 @@ class AffectedInstances(IChart):
             "segments": self._segments(instance, findings)
         }
 
-    def criterion(self):
-        criterion = super(AffectedInstances, self).criterion()
+    def criteria(self):
+        criterion = super(AffectedInstances, self).criteria()
         criterion["Criterion"].update(
             {
                 "resource.resourceType": {
@@ -112,8 +112,8 @@ class AffectedInstances(IChart):
         )
         return criterion
 
-    def build(self, findings):
-        build = super(AffectedInstances, self).build()
+    def tile_data(self, findings):
+        build = super(AffectedInstances, self).tile_data()
         build.update(
             {
                 "label_headers": [
