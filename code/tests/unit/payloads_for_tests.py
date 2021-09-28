@@ -1,5 +1,3 @@
-from datetime import datetime
-
 EXPECTED_RESPONSE_OF_JWKS_ENDPOINT = {
     "keys": [
         {
@@ -123,21 +121,20 @@ TILES_RESPONSE = {
             ],
             "title": "Affected instances",
             "type": "donut_graph"
-        }
-    ]
-}
-
-AFFECTED_INSTANCES_CRITERIA = {
-    "Criterion": {
-        "resource.resourceType": {
-            "Equals": [
-                "Instance"
-            ]
         },
-        "updatedAt": {
-            "Gt": 1631653200,
-        }
-    }
+        {
+            "default_period": "last_7_days",
+            "description": "Events grouped by severity per day "
+                           "chart shows quantity of events per "
+                           "day for the given period of time.",
+            "id": "events_per_day",
+            "periods": ["last_24_hours", "last_7_days", "last_30_days"],
+            "short_description": "Events grouped by severity per "
+                                 "day for given time period.",
+            "tags": ["events_per_day"],
+            "title": "Events grouped by severity per day",
+            "type": "vertical_bar_chart"}
+    ]
 }
 
 OBSERVE_RESPONSE = {
@@ -443,6 +440,11 @@ REFER_RESPONSE = {
     ]
 }
 
+OBSERVED_TIME = {
+    "end_time": "2021-09-28T19:07:58",
+    "start_time": "2021-09-21T16:07:58"
+}
+
 
 def guard_duty_response():
     return [
@@ -576,7 +578,7 @@ def guard_duty_response():
             "Title": "Drive-by source domain "
                      "name queried by EC2 instance i-99999999.",
             "Type": "Trojan:EC2/DriveBySourceTraffic!DNS",
-            "UpdatedAt": "2021-09-20T14:24:35.130Z"
+            "UpdatedAt": "2021-09-23T14:24:35.130Z"
         },
         {
             "AccountId": "id",
@@ -707,29 +709,97 @@ def guard_duty_response():
             "Title": "Command and Control server domain "
                      "name queried by EC2 instance i-99999999.",
             "Type": "Backdoor:EC2/C&CActivity.B!DNS",
-            "UpdatedAt": "2021-09-20T14:24:35.130Z"
+            "UpdatedAt": "2021-09-22T14:24:35.130Z"
         }
     ]
 
 
-def tile_data_response():
-    end_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    start_time = datetime.utcfromtimestamp(
-        AFFECTED_INSTANCES_CRITERIA["Criterion"]["updatedAt"]["Gt"]
+def tile_data_response(tile_id):
+    data = {
+        "affected_instances": {
+            "data": {
+                "cache_scope": "none",
+                "data": [
+                    {
+                        "key": 0,
+                        "segments": [
+                            {
+                                "key": 0,
+                                "value": 1
+                            },
+                            {
+                                "key": 1,
+                                "value": 1
+                            }
+                        ],
+                        "value": 2
+                    }
+                ],
+                "hide_legend": False,
+                "label_headers": [
+                    "Affected instances",
+                    "Finding types"
+                ],
+                "labels": [
+                    [
+                        "i-99999999"
+                    ],
+                    [
+                        "Backdoor:EC2/C&CActivity.B!DNS",
+                        "Trojan:EC2/DriveBySourceTraffic!DNS"
+                    ]
+                ]
+            }
+        },
+        "events_per_day": {
+            "data": {
+                "cache_scope": "none",
+                "data": [
+                    {
+                        "key": "2021-09-23",
+                        "label": "2021-09-23",
+                        "value": 1,
+                        "values": [
+                            {
+                                "key": "high",
+                                "value": 1
+                            }
+                        ]
+                    },
+                    {
+                        "key": "2021-09-22",
+                        "label": "2021-09-22",
+                        "value": 1,
+                        "values": [
+                            {
+                                "key": "high",
+                                "value": 1
+                            }
+                        ]
+                    }
+                ],
+                "hide_legend": False,
+                "key_type": "string",
+                "keys": [
+                    {
+                        "key": "high",
+                        "label": "High"
+                    }
+                ]
+            }
+        }
+    }
+    data = data[tile_id]
+    data["data"].update(
+        {
+            "observed_time": {
+                "end_time": "2021-09-28T19:07:58",
+                "start_time": "2021-09-21T16:07:58"
+            },
+            "valid_time": {
+                "end_time": "2021-09-28T19:07:58",
+                "start_time": "2021-09-21T16:07:58"
+            }
+        }
     )
-    start_time = start_time.strftime("%Y-%m-%dT%H:%M:%S")
-
-    return {"data": {"cache_scope": "none",
-                     "data": [{"key": 0,
-                               "segments": [{"key": 0, "value": 1},
-                                            {"key": 1, "value": 1}],
-                               "value": 2}],
-                     "hide_legend": False,
-                     "label_headers": ["Affected instances", "Finding types"],
-                     "labels": [["i-99999999"],
-                                ["Backdoor:EC2/C&CActivity.B!DNS",
-                                 "Trojan:EC2/DriveBySourceTraffic!DNS"]],
-                     "observed_time": {"end_time": end_time,
-                                       "start_time": start_time},
-                     "valid_time": {"end_time": end_time,
-                                    "start_time": start_time}}}
+    return data

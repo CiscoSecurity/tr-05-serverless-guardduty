@@ -10,13 +10,14 @@ from tests.unit.conftest import mock_api_response
 from tests.unit.payloads_for_tests import (
     EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
     TILES_RESPONSE,
-    AFFECTED_INSTANCES_CRITERIA,
+    OBSERVED_TIME,
     tile_data_response,
     guard_duty_response
 )
 
 
 WrongCall = namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
+SuccessCall = namedtuple('SuccessCall', ('endpoint', 'payload'))
 
 
 def wrong_calls():
@@ -87,38 +88,48 @@ def test_dashboard_call_with_wrong_payload(mock_request,
     )
 
 
-def routes():
-    yield '/tiles'
-    yield '/tiles/tile-data'
+def success_calls():
+    yield SuccessCall(
+        '/tiles/tile-data',
+        {'tile_id': 'affected_instances', 'period': 'last_7_days'}
+    )
+    yield SuccessCall(
+        '/tiles/tile-data',
+        {'tile_id': 'events_per_day', 'period': 'last_7_days'}
+    )
+    yield SuccessCall(
+        '/tiles/tiles',
+        {}
+    )
 
 
-@fixture(scope='module', params=routes(), ids=lambda route: f'POST {route}')
-def route(request):
+@fixture(scope='module', params=success_calls(),
+         ids=lambda wrong_payload: f'{wrong_payload.endpoint}, '
+                                   f'{wrong_payload.payload}')
+def success_call(request):
     return request.param
-
-
-@fixture(scope='module')
-def valid_json():
-    return {"period": "last_7_days", "tile_id": "affected_instances"}
 
 
 @patch('requests.get')
 @patch('api.client.GuardDuty._look_up_for_data')
-@patch('api.charts.AffectedInstances.criterion')
-def test_dashboard_call_success(mock_criteria, mock_data, mock_request,
-                                route, client, valid_jwt,
-                                valid_json):
+@patch('api.tiles.factory.ITile.observed_time')
+def test_dashboard_call_success(mock_time, mock_data, mock_request,
+                                success_call, client, valid_jwt):
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
-    if route == '/tiles':
-        response = client.post(route, headers=get_headers(valid_jwt()))
+    if success_call.endpoint == '/tiles':
+        response = client.post(success_call.endpoint,
+                               headers=get_headers(valid_jwt()))
         assert response.status_code == HTTPStatus.OK
         assert response.json == TILES_RESPONSE
-    if route == '/tiles/tile-data':
+    if success_call.endpoint == '/tiles/tile-data':
         mock_data.return_value = guard_duty_response()
-        mock_criteria.return_value = AFFECTED_INSTANCES_CRITERIA
+        mock_time.return_value = OBSERVED_TIME
         response = client.post(
-            route, headers=get_headers(valid_jwt()), json=valid_json
+            success_call.endpoint, headers=get_headers(valid_jwt()),
+            json=success_call.payload
         )
         assert response.status_code == HTTPStatus.OK
-        assert response.json == tile_data_response()
+        assert response.json == tile_data_response(
+            success_call.payload['tile_id']
+        )
