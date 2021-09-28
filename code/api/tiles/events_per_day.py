@@ -2,10 +2,10 @@ from collections import Counter
 from datetime import timedelta, datetime
 
 from api.mapping import SEVERITY
-from api.charts.factory import IChart, DEFAULT_PERIOD
+from api.tiles.factory import ITile, DEFAULT_PERIOD
 
 
-class EventsPerDay(IChart):
+class EventsPerDay(ITile):
     def __init__(self, period=DEFAULT_PERIOD):
         self._type = "vertical_bar_chart"
         self._id = "events_per_day"
@@ -18,7 +18,7 @@ class EventsPerDay(IChart):
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self.days = self.periods[period]
+        self.period = period
         self._description = (
             "Events grouped by severity per day chart shows "
             "quantity of events per day for the given period of time."
@@ -95,8 +95,9 @@ class EventsPerDay(IChart):
 
     def _group_by_date(self, data):
         base = datetime.today()
+        days = self.periods[self.period]
         date_list = [
-            (base - timedelta(days=x)).date() for x in range(self.days)
+            (base - timedelta(days=x)).date() for x in range(days)
         ]
 
         return [
@@ -109,8 +110,8 @@ class EventsPerDay(IChart):
             for x in date_list
         ]
 
-    def build(self, findings):
-        build = super(EventsPerDay, self).build()
+    def tile_data(self, findings):
+        build = super(EventsPerDay, self).tile_data()
 
         grouped_findings = self._group_by_date(findings)
         build.update(
