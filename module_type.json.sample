@@ -1,16 +1,17 @@
 {
-    "description": "AWS Guard Duty integration provides threat intelligence feeds, such as lists of malicious IP addresses and domains, and machine learning to identify unexpected and potentially unauthorized and malicious activity within your AWS environment. When you search for an observable in Amazon GuardDuty, it investigates it in AWS Detective.\n\n This integration allows you to query IPv4 and IPv6 data types and it returns indicators and sightings.",
+    "description": "Amazon Guard Duty integration provides threat intelligence feeds, such as lists of malicious IP addresses and domains, and machine learning to identify unexpected and potentially unauthorized and malicious activity within your AWS environment. When you search for an observable in Amazon GuardDuty, it investigates it in Amazon Detective.\n\n This integration allows you to query IPv4 and IPv6 data types and it returns indicators and sightings.",
     "properties": {
         "supported-apis": [
             "health",
             "observe/observables",
-            "refer/observables"
+            "refer/observables",
+            "tiles",
+            "tiles/tile-data"
         ],
         "url": "https://ciscohosted.url",
         "auth-type": "configuration-token",
         "configuration-token-alg": "RS256",
-        "custom_jwks_host": "visibility.amp.cisco.com",
-        "configuration-token-audience": "https://securex.us.security.cisco.com"
+        "custom_jwks_host": "visibility.amp.cisco.com"
     },
     "capabilities": [
         {
