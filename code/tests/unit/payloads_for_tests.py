@@ -766,8 +766,38 @@ def tile_data_response(tile_id):
                 "cache_scope": "none",
                 "data": [
                     {
-                        "key": "2021-09-23",
-                        "label": "2021-09-23",
+                        "key": "09/28",
+                        "label": "09/28",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/27",
+                        "label": "09/27",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/26",
+                        "label": "09/26",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/25",
+                        "label": "09/25",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/24",
+                        "label": "09/24",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/23",
+                        "label": "09/23",
                         "value": 1,
                         "values": [
                             {
@@ -777,8 +807,8 @@ def tile_data_response(tile_id):
                         ]
                     },
                     {
-                        "key": "2021-09-22",
-                        "label": "2021-09-22",
+                        "key": "09/22",
+                        "label": "09/22",
                         "value": 1,
                         "values": [
                             {
