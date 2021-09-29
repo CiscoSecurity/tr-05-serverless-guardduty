@@ -6,52 +6,44 @@ from api.tiles.factory import ITile
 
 
 class EventsPerDay(ITile):
-    def __init__(self):
-        self._type = "vertical_bar_chart"
-        self._id = "events_per_day"
-        self._title = "Events grouped by severity per day"
-        self._tags = [
-            "events_per_day"
-        ]
-        self._periods = {
+
+    @property
+    def _id(self):
+        return "events_per_day"
+
+    @property
+    def _type(self):
+        return "vertical_bar_chart"
+
+    @property
+    def _tags(self):
+        return ["events_per_day"]
+
+    @property
+    def _title(self):
+        return "Events grouped by severity per day"
+
+    @property
+    def _description(self):
+        return (
+            "Events grouped by severity per day chart shows "
+            "quantity of events per day for the given period of time."
+        )
+
+    @property
+    def _short_description(self):
+        return (
+            "Events grouped by severity per day "
+            "for given time period."
+        )
+
+    @property
+    def _periods(self):
+        return {
             "last_24_hours": 1,
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self._description = (
-            "Events grouped by severity per day chart shows "
-            "quantity of events per day for the given period of time."
-        )
-        self._short_description = ("Events grouped by severity per day "
-                                   "for given time period.")
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def type(self):
-        return self._type
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def description(self):
-        return self._description
-
-    @property
-    def short_description(self):
-        return self._short_description
-
-    @property
-    def periods(self):
-        return self._periods
 
     @staticmethod
     def _convert_date(date):
@@ -83,7 +75,7 @@ class EventsPerDay(ITile):
         ]
 
     def _data(self, data):
-        key = list(data.keys())[0]
+        key = list(data.keys())[0][5:11].replace("-", "/")
         data = list(data.values())[0]
         return {
             "key": key,
@@ -123,7 +115,6 @@ class EventsPerDay(ITile):
                 "key_type": "string",
                 "data": [
                     self._data(data) for data in grouped_findings
-                    if list(data.values())[0]
                 ]
             }
         )
