@@ -11,6 +11,7 @@ from tests.unit.payloads_for_tests import (
     EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
     TILES_RESPONSE,
     OBSERVED_TIME,
+    DATE_LIST,
     tile_data_response,
     guard_duty_response
 )
@@ -113,7 +114,8 @@ def success_call(request):
 @patch('requests.get')
 @patch('api.client.GuardDuty._look_up_for_data')
 @patch('api.tiles.factory.ITile.observed_time')
-def test_dashboard_call_success(mock_time, mock_data, mock_request,
+@patch('api.tiles.events_per_day.EventsPerDay._date_list')
+def test_dashboard_call_success(mock_dates, mock_time, mock_data, mock_request,
                                 success_call, client, valid_jwt):
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
@@ -125,6 +127,7 @@ def test_dashboard_call_success(mock_time, mock_data, mock_request,
     if success_call.endpoint == '/tiles/tile-data':
         mock_data.return_value = guard_duty_response()
         mock_time.return_value = OBSERVED_TIME
+        mock_dates.return_value = DATE_LIST
         response = client.post(
             success_call.endpoint, headers=get_headers(valid_jwt()),
             json=success_call.payload

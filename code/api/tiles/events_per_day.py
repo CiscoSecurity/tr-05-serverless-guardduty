@@ -93,12 +93,16 @@ class EventsPerDay(ITile):
             "value": len(data)
         }
 
-    def _group_by_date(self, data):
+    def _date_list(self):
         base = datetime.today()
         days = self.periods[self.period]
-        date_list = [
+
+        return [
             (base - timedelta(days=x)).date() for x in range(days)
         ]
+
+    def _group_by_date(self, data):
+        date_list = self._date_list()
 
         return [
             {

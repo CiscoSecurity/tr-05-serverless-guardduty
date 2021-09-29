@@ -1,3 +1,5 @@
+import datetime
+
 EXPECTED_RESPONSE_OF_JWKS_ENDPOINT = {
     "keys": [
         {
@@ -444,6 +446,16 @@ OBSERVED_TIME = {
     "end_time": "2021-09-28T19:07:58",
     "start_time": "2021-09-21T16:07:58"
 }
+
+DATE_LIST = [
+    datetime.date(2021, 9, 28),
+    datetime.date(2021, 9, 27),
+    datetime.date(2021, 9, 26),
+    datetime.date(2021, 9, 25),
+    datetime.date(2021, 9, 24),
+    datetime.date(2021, 9, 23),
+    datetime.date(2021, 9, 22)
+]
 
 
 def guard_duty_response():
