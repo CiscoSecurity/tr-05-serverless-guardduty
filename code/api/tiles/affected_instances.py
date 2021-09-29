@@ -3,52 +3,43 @@ from api.tiles.factory import ITile
 
 class AffectedInstances(ITile):
 
-    def __init__(self):
-        self._type = "donut_graph"
-        self._id = "affected_instances"
-        self._title = "Affected instances"
-        self._tags = [
-            "affected_instances"
-        ]
-        self._periods = {
+    @property
+    def _id(self):
+        return "affected_instances"
+
+    @property
+    def _type(self):
+        return "donut_graph"
+
+    @property
+    def _tags(self):
+        return ["affected_instances"]
+
+    @property
+    def _title(self):
+        return "Affected instances"
+
+    @property
+    def _description(self):
+        return (
+            "Affected Instances chart shows "
+            "what types of findings EC2 instances have."
+        )
+
+    @property
+    def _short_description(self):
+        return (
+            "Affected Instances by finding types "
+            "for given time period."
+        )
+
+    @property
+    def _periods(self):
+        return {
             "last_24_hours": 1,
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self._description = (
-            "Affected Instances chart shows "
-            "what types of findings EC2 instances have."
-        )
-        self._short_description = ("Affected Instances by finding types "
-                                   "for given time period.")
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def type(self):
-        return self._type
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def description(self):
-        return self._description
-
-    @property
-    def short_description(self):
-        return self._short_description
-
-    @property
-    def periods(self):
-        return self._periods
 
     @staticmethod
     def affected_iscs_id(findings):
