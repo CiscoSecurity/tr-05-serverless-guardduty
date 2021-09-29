@@ -2,11 +2,11 @@ from collections import Counter
 from datetime import timedelta, datetime
 
 from api.mapping import SEVERITY
-from api.tiles.factory import ITile, DEFAULT_PERIOD
+from api.tiles.factory import ITile
 
 
 class EventsPerDay(ITile):
-    def __init__(self, period=DEFAULT_PERIOD):
+    def __init__(self):
         self._type = "vertical_bar_chart"
         self._id = "events_per_day"
         self._title = "Events grouped by severity per day"
@@ -18,7 +18,6 @@ class EventsPerDay(ITile):
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self.period = period
         self._description = (
             "Events grouped by severity per day chart shows "
             "quantity of events per day for the given period of time."
@@ -93,16 +92,16 @@ class EventsPerDay(ITile):
             "value": len(data)
         }
 
-    def _date_list(self):
+    def _date_list(self, period):
         base = datetime.today()
-        days = self.periods[self.period]
+        days = self.periods[period]
 
         return [
             (base - timedelta(days=x)).date() for x in range(days)
         ]
 
-    def _group_by_date(self, data):
-        date_list = self._date_list()
+    def _group_by_date(self, data, period):
+        date_list = self._date_list(period)
 
         return [
             {
@@ -114,10 +113,10 @@ class EventsPerDay(ITile):
             for x in date_list
         ]
 
-    def tile_data(self, findings):
-        build = super(EventsPerDay, self).tile_data()
+    def tile_data(self, findings, period):
+        build = super(EventsPerDay, self).tile_data(period)
 
-        grouped_findings = self._group_by_date(findings)
+        grouped_findings = self._group_by_date(findings, period)
         build.update(
             {
                 "keys": self._keys(findings),
