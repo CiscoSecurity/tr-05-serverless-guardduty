@@ -9,14 +9,19 @@ from api.errors import INVALID_ARGUMENT
 from tests.unit.conftest import mock_api_response
 from tests.unit.payloads_for_tests import (
     EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
-    TILES_RESPONSE,
-    AFFECTED_INSTANCES_CRITERIA,
+    OBSERVED_TIME,
+    DATE_LIST,
+    tiles_reponse,
+    tile_reponse,
     tile_data_response,
     guard_duty_response
 )
 
 
-WrongCall = namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
+WrongCall = \
+    namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
+SuccessCall = \
+    namedtuple('SuccessCall', ('endpoint', 'payload', 'relay_response'))
 
 
 def wrong_calls():
@@ -42,6 +47,17 @@ def wrong_calls():
         {'tile_id': 'some_value', 'period': ''},
         "{'period': ['Must be one of: "
         "last_24_hours, last_7_days, last_30_days.']}"
+    )
+    yield WrongCall(
+        '/tiles/tile',
+        {'tile_id': ''},
+        "{'tile_id': ['Field may not be blank.']}"
+    )
+    yield WrongCall(
+        '/tiles/tile',
+        {'tile-id': 'some_value'},
+        "{'tile_id': ['Missing data for required field.'], "
+        "'tile-id': ['Unknown field.']}"
     )
 
 
@@ -87,38 +103,56 @@ def test_dashboard_call_with_wrong_payload(mock_request,
     )
 
 
-def routes():
-    yield '/tiles'
-    yield '/tiles/tile-data'
+def success_calls():
+    yield SuccessCall(
+        '/tiles/tile-data',
+        {'tile_id': 'affected_instances', 'period': 'last_7_days'},
+        tile_data_response('affected_instances')
+    )
+    yield SuccessCall(
+        '/tiles/tile-data',
+        {'tile_id': 'events_per_day', 'period': 'last_7_days'},
+        tile_data_response('events_per_day')
+    )
+    yield SuccessCall(
+        '/tiles',
+        {},
+        tiles_reponse()
+    )
+    yield SuccessCall(
+        '/tiles/tile',
+        {'tile_id': 'affected_instances'},
+        tile_reponse('affected_instances')
+    )
+    yield SuccessCall(
+        '/tiles/tile',
+        {'tile_id': 'events_per_day'},
+        tile_reponse('events_per_day')
+    )
 
 
-@fixture(scope='module', params=routes(), ids=lambda route: f'POST {route}')
-def route(request):
+@fixture(scope='module', params=success_calls(),
+         ids=lambda success_payload: f'{success_payload.endpoint}, '
+                                     f'{success_payload.payload}')
+def success_call(request):
     return request.param
-
-
-@fixture(scope='module')
-def valid_json():
-    return {"period": "last_7_days", "tile_id": "affected_instances"}
 
 
 @patch('requests.get')
 @patch('api.client.GuardDuty._look_up_for_data')
-@patch('api.charts.AffectedInstances.criterion')
-def test_dashboard_call_success(mock_criteria, mock_data, mock_request,
-                                route, client, valid_jwt,
-                                valid_json):
+@patch('api.tiles.factory.ITile.observed_time')
+@patch('api.tiles.events_per_day.EventsPerDay._date_list')
+def test_dashboard_call_success(mock_dates, mock_time, mock_data, mock_request,
+                                success_call, client, valid_jwt):
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
-    if route == '/tiles':
-        response = client.post(route, headers=get_headers(valid_jwt()))
-        assert response.status_code == HTTPStatus.OK
-        assert response.json == TILES_RESPONSE
-    if route == '/tiles/tile-data':
-        mock_data.return_value = guard_duty_response()
-        mock_criteria.return_value = AFFECTED_INSTANCES_CRITERIA
-        response = client.post(
-            route, headers=get_headers(valid_jwt()), json=valid_json
-        )
-        assert response.status_code == HTTPStatus.OK
-        assert response.json == tile_data_response()
+    mock_data.return_value = guard_duty_response()
+    mock_time.return_value = OBSERVED_TIME
+    mock_dates.return_value = DATE_LIST
+    response = client.post(
+        success_call.endpoint, headers=get_headers(valid_jwt()),
+        json=success_call.payload
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json == success_call.relay_response
