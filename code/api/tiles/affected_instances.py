@@ -1,9 +1,9 @@
-from api.tiles.factory import ITile, DEFAULT_PERIOD
+from api.tiles.factory import ITile
 
 
 class AffectedInstances(ITile):
 
-    def __init__(self, period=DEFAULT_PERIOD):
+    def __init__(self):
         self._type = "donut_graph"
         self._id = "affected_instances"
         self._title = "Affected instances"
@@ -15,7 +15,6 @@ class AffectedInstances(ITile):
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self.period = period
         self._description = (
             "Affected Instances chart shows "
             "what types of findings EC2 instances have."
@@ -99,8 +98,8 @@ class AffectedInstances(ITile):
             "segments": self._segments(instance, findings)
         }
 
-    def criteria(self):
-        criterion = super(AffectedInstances, self).criteria()
+    def criteria(self, period):
+        criterion = super(AffectedInstances, self).criteria(period)
         criterion["Criterion"].update(
             {
                 "resource.resourceType": {
@@ -112,8 +111,8 @@ class AffectedInstances(ITile):
         )
         return criterion
 
-    def tile_data(self, findings):
-        build = super(AffectedInstances, self).tile_data()
+    def tile_data(self, findings, period):
+        build = super(AffectedInstances, self).tile_data(period)
         build.update(
             {
                 "label_headers": [

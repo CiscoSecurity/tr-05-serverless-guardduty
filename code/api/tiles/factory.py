@@ -11,37 +11,22 @@ DEFAULT_PERIOD = "last_7_days"
 class TileFactory:
 
     @staticmethod
-    def get_tile(tile_id, period):
+    def get_tile(tile_id):
 
         for cls in ITile.__subclasses__():
             if cls.__call__().id == tile_id:
-                return cls(period)
+                return cls()
         raise TRFormattedError(400, INVALID_TILE_ID)
 
     @staticmethod
     def list_tiles():
-        def tile(cls):
-            return {
-                "id": cls.id,
-                "type": cls.type,
-                "title": cls.title,
-                "tags": cls.tags,
-                "description": cls.description,
-                "short_description": cls.short_description,
-                "periods": list(cls.periods.keys()),
-                "default_period": cls.default_period
-            }
-        return [tile(cls.__call__()) for cls in ITile.__subclasses__()]
+        return [cls().tile() for cls in ITile.__subclasses__()]
 
 
 class ITile(metaclass=ABCMeta):
 
-    @abstractmethod
-    def __init__(self, period):
-        self.period = period
-
-    def observed_time(self):
-        delta = timedelta(days=self.periods[self.period])
+    def observed_time(self, period):
+        delta = timedelta(days=self.periods[period])
         today = datetime.today()
 
         return {
@@ -49,8 +34,8 @@ class ITile(metaclass=ABCMeta):
             'end_time': datetime.now().isoformat(timespec='milliseconds')
         }
 
-    def valid_time(self):
-        return ITile.observed_time(self)
+    def valid_time(self, period):
+        return self.observed_time(period)
 
     @property
     @abstractmethod
@@ -92,18 +77,9 @@ class ITile(metaclass=ABCMeta):
         """Returns tile default period."""
         return DEFAULT_PERIOD
 
-    def tile_data(self):
-        """Returns tile data."""
-        return {
-            "hide_legend": False,
-            "cache_scope": "none",
-            "observed_time": self.observed_time(),
-            "valid_time": self.valid_time()
-        }
-
-    def criteria(self):
+    def criteria(self, period):
         """Returns tile filter criteria."""
-        days = timedelta(self.periods[self.period])
+        days = timedelta(self.periods[period])
         date = int((datetime.utcnow() - days).timestamp() * 1000)
 
         return {
@@ -112,4 +88,25 @@ class ITile(metaclass=ABCMeta):
                     "Gt": date,
                 }
             }
+        }
+
+    def tile_data(self, period):
+        """Returns tile data."""
+        return {
+            "hide_legend": False,
+            "cache_scope": "none",
+            "observed_time": self.observed_time(period),
+            "valid_time": self.valid_time(period)
+        }
+
+    def tile(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "title": self.title,
+            "tags": self.tags,
+            "description": self.description,
+            "short_description": self.short_description,
+            "periods": list(self.periods.keys()),
+            "default_period": self.default_period
         }
