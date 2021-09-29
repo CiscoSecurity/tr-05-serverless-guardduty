@@ -104,39 +104,37 @@ bjJ/JfTO5060SsWftf4iw3jrhSn9RwTTYdq/kErGFWvDGJn2MiuhMe2onNfVzIGR
 mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 -----END RSA PRIVATE KEY-----"""
 
-TILES_RESPONSE = {
-    "data": [
-        {
-            "default_period": "last_7_days",
-            "description": ("Affected Instances chart shows what"
-                            " types of findings EC2 instances have."),
-            "id": "affected_instances",
-            "periods": [
-                "last_24_hours",
-                "last_7_days",
-                "last_30_days"
-            ],
-            "short_description": ("Affected Instances by finding "
-                                  "types for given time period."),
-            "tags": [
-                "affected_instances"
-            ],
-            "title": "Affected instances",
-            "type": "donut_graph"
-        },
-        {
-            "default_period": "last_7_days",
-            "description": "Events grouped by severity per day "
-                           "chart shows quantity of events per "
-                           "day for the given period of time.",
-            "id": "events_per_day",
-            "periods": ["last_24_hours", "last_7_days", "last_30_days"],
-            "short_description": "Events grouped by severity per "
-                                 "day for given time period.",
-            "tags": ["events_per_day"],
-            "title": "Events grouped by severity per day",
-            "type": "vertical_bar_chart"}
-    ]
+AFFECTED_INSTANCES_TILE = {
+    "default_period": "last_7_days",
+    "description": ("Affected Instances chart shows what"
+                    " types of findings EC2 instances have."),
+    "id": "affected_instances",
+    "periods": [
+        "last_24_hours",
+        "last_7_days",
+        "last_30_days"
+    ],
+    "short_description": ("Affected Instances by finding "
+                          "types for given time period."),
+    "tags": [
+        "affected_instances"
+    ],
+    "title": "Affected instances",
+    "type": "donut_graph"
+}
+
+EVENTS_PER_DAY_TILE = {
+    "default_period": "last_7_days",
+    "description": "Events grouped by severity per day "
+                   "chart shows quantity of events per "
+                   "day for the given period of time.",
+    "id": "events_per_day",
+    "periods": ["last_24_hours", "last_7_days", "last_30_days"],
+    "short_description": "Events grouped by severity per "
+                         "day for given time period.",
+    "tags": ["events_per_day"],
+    "title": "Events grouped by severity per day",
+    "type": "vertical_bar_chart"
 }
 
 OBSERVE_RESPONSE = {
@@ -815,3 +813,22 @@ def tile_data_response(tile_id):
         }
     )
     return data
+
+
+def tiles_reponse():
+    return {
+        "data": [
+            AFFECTED_INSTANCES_TILE,
+            EVENTS_PER_DAY_TILE
+        ]
+    }
+
+
+def tile_reponse(tile_id):
+    response = {
+        "affected_instances": AFFECTED_INSTANCES_TILE,
+        "events_per_day": EVENTS_PER_DAY_TILE
+    }
+    return {
+        "data": response[tile_id]
+    }
