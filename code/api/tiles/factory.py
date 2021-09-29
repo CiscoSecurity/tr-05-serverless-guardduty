@@ -4,23 +4,23 @@ from datetime import timedelta, datetime
 from api.errors import TRFormattedError
 
 
-INVALID_CHART_ID = "Invalid chart id"
+INVALID_TILE_ID = "Invalid tile id"
 DEFAULT_PERIOD = "last_7_days"
 
 
 class TileFactory:
 
     @staticmethod
-    def get_tile(chart_id, period):
+    def get_tile(tile_id, period):
 
         for cls in ITile.__subclasses__():
-            if cls.__call__().id == chart_id:
+            if cls.__call__().id == tile_id:
                 return cls(period)
-        raise TRFormattedError(400, INVALID_CHART_ID)
+        raise TRFormattedError(400, INVALID_TILE_ID)
 
     @staticmethod
     def list_tiles():
-        def chart(cls):
+        def tile(cls):
             return {
                 "id": cls.id,
                 "type": cls.type,
@@ -31,7 +31,7 @@ class TileFactory:
                 "periods": list(cls.periods.keys()),
                 "default_period": cls.default_period
             }
-        return [chart(cls.__call__()) for cls in ITile.__subclasses__()]
+        return [tile(cls.__call__()) for cls in ITile.__subclasses__()]
 
 
 class ITile(metaclass=ABCMeta):
@@ -55,45 +55,45 @@ class ITile(metaclass=ABCMeta):
     @property
     @abstractmethod
     def id(self):
-        """Returns chart id."""
+        """Returns tile id."""
 
     @property
     @abstractmethod
     def type(self):
-        """Returns chart type."""
+        """Returns tile type."""
 
     @property
     @abstractmethod
     def tags(self):
-        """Returns chart tags."""
+        """Returns tile tags."""
 
     @property
     @abstractmethod
     def title(self):
-        """Returns chart title."""
+        """Returns tile title."""
 
     @property
     @abstractmethod
     def description(self):
-        """Returns chart description."""
+        """Returns tile description."""
 
     @property
     @abstractmethod
     def short_description(self):
-        """Returns chart short description."""
+        """Returns tile short description."""
 
     @property
     @abstractmethod
     def periods(self):
-        """Returns chart available periods to represent data."""
+        """Returns tile available periods to represent data."""
 
     @property
     def default_period(self):
-        """Returns chart available periods to represent data."""
+        """Returns tile default period."""
         return DEFAULT_PERIOD
 
     def tile_data(self):
-        """Returns chart data."""
+        """Returns tile data."""
         return {
             "hide_legend": False,
             "cache_scope": "none",
@@ -102,7 +102,7 @@ class ITile(metaclass=ABCMeta):
         }
 
     def criteria(self):
-        """Returns chart filter criteria."""
+        """Returns tile filter criteria."""
         days = timedelta(self.periods[self.period])
         date = int((datetime.utcnow() - days).timestamp() * 1000)
 
