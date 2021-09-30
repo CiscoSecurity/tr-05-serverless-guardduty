@@ -71,8 +71,8 @@ class EventsPerDay(ITile):
         ]
 
     def _data(self, data):
-        key = list(data.keys())[0][5:11].replace("-", "/")
-        data = list(data.values())[0]
+        key = data[0]
+        data = data[1]
         return {
             "key": key,
             "values": self._values(data),
@@ -92,12 +92,13 @@ class EventsPerDay(ITile):
         date_list = self._date_list(period)
 
         return [
-            {
-                str(x): [
+            (
+                x.strftime('%m/%d'),
+                [
                     y for y in data
                     if self._convert_date(y.UpdatedAt).date() == x
                 ]
-            }
+            )
             for x in date_list
         ]
 
