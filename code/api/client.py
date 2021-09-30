@@ -126,11 +126,14 @@ class GuardDuty(object):
             MaxResults=limit if limit <= self.max_results
             else self.max_results
         )
-        if self._token and \
-                (0 < len(self._findings) < limit or unlimited):
+        if self._token and (0 < len(self._findings) < limit or unlimited):
             limit = limit - self.max_results
-            self.search(criteria=criteria, order=order,
-                        limit=limit, unlimited=unlimited)
+            self.search(
+                criteria=criteria,
+                order=order,
+                limit=limit,
+                unlimited=unlimited
+            )
 
     def health(self):
         try:
