@@ -17,7 +17,7 @@ class EventsPerDay(ITile):
 
     @property
     def _tags(self):
-        return ["events_per_day"]
+        return [self._id]
 
     @property
     def _title(self):
@@ -26,16 +26,13 @@ class EventsPerDay(ITile):
     @property
     def _description(self):
         return (
-            "Events grouped by severity per day chart shows "
+            f"{self._title} tile shows "
             "quantity of events per day for the given period of time."
         )
 
     @property
     def _short_description(self):
-        return (
-            "Events grouped by severity per day "
-            "for given time period."
-        )
+        return f"{self._title} for given time period."
 
     @property
     def _periods(self):
@@ -86,7 +83,7 @@ class EventsPerDay(ITile):
 
     def _date_list(self, period):
         base = datetime.today()
-        days = self.periods[period]
+        days = self._periods[period]
 
         return [
             (base - timedelta(days=x)).date() for x in range(days)

@@ -13,23 +13,23 @@ class AffectedInstances(ITile):
 
     @property
     def _tags(self):
-        return ["affected_instances"]
+        return [self._id]
 
     @property
     def _title(self):
-        return "Affected instances"
+        return "Affected Instances"
 
     @property
     def _description(self):
         return (
-            "Affected Instances chart shows "
+            f"{self._title} tile shows "
             "what types of findings EC2 instances have."
         )
 
     @property
     def _short_description(self):
         return (
-            "Affected Instances by finding types "
+            f"{self._title} by finding types "
             "for given time period."
         )
 
@@ -89,8 +89,8 @@ class AffectedInstances(ITile):
             "segments": self._segments(instance, findings)
         }
 
-    def criteria(self, period):
-        criterion = super(AffectedInstances, self).criteria(period)
+    def finding_criteria(self, period):
+        criterion = super(AffectedInstances, self).finding_criteria(period)
         criterion["Criterion"].update(
             {
                 "resource.resourceType": {

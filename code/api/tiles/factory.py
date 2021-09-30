@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import timedelta, datetime
 
 from api.errors import TRFormattedError
-
+from api.client import GuardDuty
 
 INVALID_TILE_ID = "Invalid tile id"
 DEFAULT_PERIOD = "last_7_days"
@@ -77,7 +77,16 @@ class ITile(metaclass=ABCMeta):
         """Returns tile default period."""
         return DEFAULT_PERIOD
 
-    def criteria(self, period):
+    @property
+    def limit(self):
+        return None
+
+    @property
+    def sort_criteria(self):
+        """Returns sorting criteria."""
+        return GuardDuty.DEFAULT_ORDER
+
+    def finding_criteria(self, period):
         """Returns tile filter criteria."""
         days = timedelta(self._periods[period])
         date = int((datetime.utcnow() - days).timestamp() * 1000)
@@ -100,6 +109,7 @@ class ITile(metaclass=ABCMeta):
         }
 
     def tile(self):
+        """Returns tile object."""
         return {
             "id": self._id,
             "type": self._type,
