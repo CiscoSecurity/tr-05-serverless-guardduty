@@ -50,8 +50,7 @@ class TopTenFindings(ITile):
             "OrderBy": "DESC"
         }
 
-    @staticmethod
-    def _data(findings):
+    def tile_data(self, findings, period):
         row = "| {number} | {description} | {count} |"
         table = [
             "|  №  | Description | Count |",
@@ -65,12 +64,6 @@ class TopTenFindings(ITile):
             ) for index, item in enumerate(findings)]
         )
         return {
-            "data": table
+            "data": table,
+            **self.tile_extra_data(period)
         }
-
-    def tile_data(self, findings, period):
-        data = super(TopTenFindings, self).tile_data(period)
-        data.update(
-            self._data(findings)
-        )
-        return data

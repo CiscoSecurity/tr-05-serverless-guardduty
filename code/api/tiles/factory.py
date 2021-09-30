@@ -86,6 +86,10 @@ class ITile(metaclass=ABCMeta):
         """Returns sorting criteria."""
         return GuardDuty.DEFAULT_ORDER
 
+    @abstractmethod
+    def tile_data(self):
+        """Returns tile mapped data."""
+
     def finding_criteria(self, period):
         """Returns tile filter criteria."""
         days = timedelta(self._periods[period])
@@ -99,8 +103,8 @@ class ITile(metaclass=ABCMeta):
             }
         }
 
-    def tile_data(self, period):
-        """Returns tile data."""
+    def tile_extra_data(self, period):
+        """Returns tile extra data."""
         return {
             "hide_legend": False,
             "cache_scope": "none",

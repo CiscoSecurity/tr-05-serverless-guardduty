@@ -103,16 +103,13 @@ class EventsPerDay(ITile):
         ]
 
     def tile_data(self, findings, period):
-        build = super(EventsPerDay, self).tile_data(period)
-
         grouped_findings = self._group_by_date(findings, period)
-        build.update(
-            {
+
+        return {
                 "keys": self._keys(findings),
                 "key_type": "string",
                 "data": [
                     self._data(data) for data in grouped_findings
-                ]
+                ],
+                **self.tile_extra_data(period)
             }
-        )
-        return build
