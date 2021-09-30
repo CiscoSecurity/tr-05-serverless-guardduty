@@ -103,9 +103,7 @@ class AffectedInstances(ITile):
         return criterion
 
     def tile_data(self, findings, period):
-        build = super(AffectedInstances, self).tile_data(period)
-        build.update(
-            {
+        return {
                 "label_headers": [
                     "Affected instances",
                     "Finding types"
@@ -117,7 +115,6 @@ class AffectedInstances(ITile):
                 "data": [
                     self._data(instance, findings) for instance
                     in self.affected_iscs_id(findings)
-                ]
+                ],
+                **self.tile_extra_data(period)
             }
-        )
-        return build

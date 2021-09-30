@@ -105,10 +105,9 @@ class GuardDuty(object):
             ).get('Findings')
 
         except (BotoCoreError, ValueError, ClientError) as error:
-            if hasattr(error, 'operation_name'):
-                if error.operation_name == 'ListFindings' and \
-                        error.response.get('Type') == 'InternalException':
-                    return []
+            if getattr(error, 'operation_name', None) == 'ListFindings' and \
+                    error.response.get('Type') == 'InternalException':
+                return []
             raise GuardDutyError(error.args[0])
 
         self._token = data.get('NextToken')
