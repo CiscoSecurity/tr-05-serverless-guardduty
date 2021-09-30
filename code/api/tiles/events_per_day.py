@@ -42,8 +42,8 @@ class EventsPerDay(ITile):
         }
 
     @staticmethod
-    def _convert_date(date):
-        return datetime.strptime(date.split("T")[0], '%Y-%m-%d')
+    def _parse_date(date):
+        return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
 
     @staticmethod
     def _keys(data):
@@ -96,7 +96,7 @@ class EventsPerDay(ITile):
                 x.strftime('%m/%d'),
                 [
                     y for y in data
-                    if self._convert_date(y.UpdatedAt).date() == x
+                    if self._parse_date(y.UpdatedAt) == x
                 ]
             )
             for x in date_list
