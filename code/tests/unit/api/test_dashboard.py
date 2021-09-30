@@ -17,7 +17,6 @@ from tests.unit.payloads_for_tests import (
     guard_duty_response
 )
 
-
 WrongCall = \
     namedtuple('WrongCall', ('endpoint', 'payload', 'message'))
 SuccessCall = \
@@ -104,40 +103,26 @@ def test_dashboard_call_with_wrong_payload(mock_request,
 
 
 def success_calls():
-    yield SuccessCall(
-        '/tiles/tile-data',
-        {'tile_id': 'affected_instances', 'period': 'last_7_days'},
-        tile_data_response('affected_instances')
-    )
-    yield SuccessCall(
-        '/tiles/tile-data',
-        {'tile_id': 'events_per_day', 'period': 'last_7_days'},
-        tile_data_response('events_per_day')
-    )
-    yield SuccessCall(
-        '/tiles/tile-data',
-        {'tile_id': 'top_ten_findings', 'period': 'last_7_days'},
-        tile_data_response('top_ten_findings')
-    )
+    ids = [
+        'affected_instances',
+        'events_per_day',
+        'top_ten_findings'
+    ]
+    for tile_id in ids:
+        yield SuccessCall(
+            '/tiles/tile-data',
+            {'tile_id': tile_id, 'period': 'last_7_days'},
+            tile_data_response(tile_id)
+        )
+        yield SuccessCall(
+            '/tiles/tile',
+            {'tile_id': tile_id},
+            tile_reponse(tile_id)
+        )
     yield SuccessCall(
         '/tiles',
         {},
         tiles_reponse()
-    )
-    yield SuccessCall(
-        '/tiles/tile',
-        {'tile_id': 'affected_instances'},
-        tile_reponse('affected_instances')
-    )
-    yield SuccessCall(
-        '/tiles/tile',
-        {'tile_id': 'events_per_day'},
-        tile_reponse('events_per_day')
-    )
-    yield SuccessCall(
-        '/tiles/tile',
-        {'tile_id': 'top_ten_findings'},
-        tile_reponse('top_ten_findings')
     )
 
 
