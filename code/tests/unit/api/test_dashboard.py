@@ -115,6 +115,11 @@ def success_calls():
         tile_data_response('events_per_day')
     )
     yield SuccessCall(
+        '/tiles/tile-data',
+        {'tile_id': 'top_ten_findings', 'period': 'last_7_days'},
+        tile_data_response('top_ten_findings')
+    )
+    yield SuccessCall(
         '/tiles',
         {},
         tiles_reponse()
@@ -128,6 +133,11 @@ def success_calls():
         '/tiles/tile',
         {'tile_id': 'events_per_day'},
         tile_reponse('events_per_day')
+    )
+    yield SuccessCall(
+        '/tiles/tile',
+        {'tile_id': 'top_ten_findings'},
+        tile_reponse('top_ten_findings')
     )
 
 
