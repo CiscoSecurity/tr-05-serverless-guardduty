@@ -79,7 +79,7 @@ class ITile(metaclass=ABCMeta):
 
     @property
     def limit(self):
-        return None
+        return 0
 
     @property
     def sort_criteria(self):
