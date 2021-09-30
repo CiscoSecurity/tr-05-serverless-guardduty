@@ -37,7 +37,6 @@ class EventsPerDay(ITile):
     @property
     def _periods(self):
         return {
-            "last_24_hours": 1,
             "last_7_days": 7,
             "last_30_days": 30
         }

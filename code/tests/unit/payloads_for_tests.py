@@ -129,7 +129,7 @@ EVENTS_PER_DAY_TILE = {
                    "tile shows quantity of events per "
                    "day for the given period of time.",
     "id": "events_per_day",
-    "periods": ["last_24_hours", "last_7_days", "last_30_days"],
+    "periods": ["last_7_days", "last_30_days"],
     "short_description": "Events grouped by severity per "
                          "day for given time period.",
     "tags": ["events_per_day"],
