@@ -45,7 +45,7 @@ class TotalEventsTile(ITile):
 
     @staticmethod
     def _data(findings):
-        def metric(_type):
+        def _metric(_type):
             data = filter(lambda f: f.Resource.ResourceType == _type, findings)
             return {
                 "icon": "warning",
@@ -53,7 +53,7 @@ class TotalEventsTile(ITile):
                 "value": sum([finding.Service.Count for finding in data]),
                 "value_unit": "integer",
             }
-        return [metric(_type) for _type in FINDING_TYPES.keys()]
+        return [_metric(_type) for _type in FINDING_TYPES.keys()]
 
     def tile_data(self, findings, period):
         return {
