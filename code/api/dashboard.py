@@ -33,6 +33,11 @@ def tile_data():
     tile_id, period = payload['tile_id'], payload['period']
     tile_obj = TileFactory().get_tile(tile_id)
     client = GuardDuty()
-    client.search(tile_obj.criteria(period), unlimited=True)
+    client.search(
+        criteria=tile_obj.finding_criteria(period),
+        order=tile_obj.sort_criteria,
+        unlimited=True if not tile_obj.limit else False,
+        limit=tile_obj.limit
+    )
 
     return jsonify_data(tile_obj.tile_data(client.findings, period))

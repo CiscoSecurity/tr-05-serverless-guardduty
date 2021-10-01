@@ -106,7 +106,7 @@ mdUxHwi1ulkspAn/fmY7f0hZpskDwcHyZmbKZuk+NU/FJ8IAcmvk9y7m25nSSc8=
 
 AFFECTED_INSTANCES_TILE = {
     "default_period": "last_7_days",
-    "description": ("Affected Instances chart shows what"
+    "description": ("Affected Instances tile shows what"
                     " types of findings EC2 instances have."),
     "id": "affected_instances",
     "periods": [
@@ -119,22 +119,41 @@ AFFECTED_INSTANCES_TILE = {
     "tags": [
         "affected_instances"
     ],
-    "title": "Affected instances",
+    "title": "Affected Instances",
     "type": "donut_graph"
 }
 
 EVENTS_PER_DAY_TILE = {
     "default_period": "last_7_days",
     "description": "Events grouped by severity per day "
-                   "chart shows quantity of events per "
+                   "tile shows quantity of events per "
                    "day for the given period of time.",
     "id": "events_per_day",
-    "periods": ["last_24_hours", "last_7_days", "last_30_days"],
+    "periods": ["last_7_days", "last_30_days"],
     "short_description": "Events grouped by severity per "
                          "day for given time period.",
     "tags": ["events_per_day"],
     "title": "Events grouped by severity per day",
     "type": "vertical_bar_chart"
+}
+
+TOP_TEN_FINDINGS_TILE = {
+    "default_period": "last_7_days",
+    "description": "Top 10 Findings by count tile provides a list of "
+                   "the top 10 findings by count.",
+    "id": "top_ten_findings",
+    "periods": [
+        "last_24_hours",
+        "last_7_days",
+        "last_30_days",
+        "last_60_days",
+        "last_90_days"
+    ],
+    "short_description": "Top 10 Findings by count tile provides a list "
+                         "of the top 10 findings by count.",
+    "tags": ["top_ten_findings"],
+    "title": "Top 10 Findings by count",
+    "type": "markdown"
 }
 
 OBSERVE_RESPONSE = {
@@ -766,8 +785,38 @@ def tile_data_response(tile_id):
                 "cache_scope": "none",
                 "data": [
                     {
-                        "key": "2021-09-23",
-                        "label": "2021-09-23",
+                        "key": "09/28",
+                        "label": "09/28",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/27",
+                        "label": "09/27",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/26",
+                        "label": "09/26",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/25",
+                        "label": "09/25",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/24",
+                        "label": "09/24",
+                        "value": 0,
+                        "values": []
+                    },
+                    {
+                        "key": "09/23",
+                        "label": "09/23",
                         "value": 1,
                         "values": [
                             {
@@ -777,8 +826,8 @@ def tile_data_response(tile_id):
                         ]
                     },
                     {
-                        "key": "2021-09-22",
-                        "label": "2021-09-22",
+                        "key": "09/22",
+                        "label": "09/22",
                         "value": 1,
                         "values": [
                             {
@@ -796,6 +845,23 @@ def tile_data_response(tile_id):
                         "label": "High"
                     }
                 ]
+            }
+        },
+        "top_ten_findings": {
+            "data": {
+                "cache_scope": "none",
+                "data": ["|  №  | Description | Count |",
+                         "| --- | ----------- | ----- |",
+                         "| 1 | EC2 instance i-99999999 "
+                         "is querying a domain name of "
+                         "a remote host that is a known "
+                         "source of Drive-By download "
+                         "attacks. | 3 |",
+                         "| 2 | EC2 instance i-99999999 "
+                         "is querying a domain name "
+                         "associated with a known "
+                         "Command & Control server. | 3 |"],
+                "hide_legend": False
             }
         }
     }
@@ -819,7 +885,8 @@ def tiles_reponse():
     return {
         "data": [
             AFFECTED_INSTANCES_TILE,
-            EVENTS_PER_DAY_TILE
+            EVENTS_PER_DAY_TILE,
+            TOP_TEN_FINDINGS_TILE
         ]
     }
 
@@ -827,7 +894,8 @@ def tiles_reponse():
 def tile_reponse(tile_id):
     response = {
         "affected_instances": AFFECTED_INSTANCES_TILE,
-        "events_per_day": EVENTS_PER_DAY_TILE
+        "events_per_day": EVENTS_PER_DAY_TILE,
+        "top_ten_findings": TOP_TEN_FINDINGS_TILE
     }
     return {
         "data": response[tile_id]
