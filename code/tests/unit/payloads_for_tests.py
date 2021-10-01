@@ -159,7 +159,7 @@ TOP_TEN_FINDINGS_TILE = {
 TOTAL_EVENTS_TILE = {
     "default_period": "last_7_days",
     "description": "Total Events tile provides the total number of "
-                   "findings.",
+                   "findings grouped by resource type.",
     "id": "total_events",
     "periods": ["last_24_hours",
                 "last_7_days",
@@ -167,7 +167,7 @@ TOTAL_EVENTS_TILE = {
                 "last_60_days",
                 "last_90_days"],
     "short_description": "Total Events tile provides the total number "
-                         "of findings.",
+                         "of findings grouped by resource type.",
     "tags": ["total_events"],
     "title": "Total Events",
     "type": "metric_group"
