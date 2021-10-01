@@ -1,7 +1,7 @@
 from api.tiles.factory import ITile
 
 
-class AffectedInstances(ITile):
+class AffectedInstancesTile(ITile):
 
     @property
     def _id(self):
@@ -90,7 +90,7 @@ class AffectedInstances(ITile):
         }
 
     def finding_criteria(self, period):
-        criterion = super(AffectedInstances, self).finding_criteria(period)
+        criterion = super(AffectedInstancesTile, self).finding_criteria(period)
         criterion["Criterion"].update(
             {
                 "resource.resourceType": {
