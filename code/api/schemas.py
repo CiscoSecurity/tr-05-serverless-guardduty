@@ -57,7 +57,9 @@ class DashboardTileDataSchema(Schema):
             [
                 "last_24_hours",
                 "last_7_days",
-                "last_30_days"
+                "last_30_days",
+                "last_60_days",
+                "last_90_days"
             ]
         ),
         required=True

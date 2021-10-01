@@ -6,56 +6,44 @@ from api.tiles.factory import ITile
 
 
 class EventsPerDay(ITile):
-    def __init__(self):
-        self._type = "vertical_bar_chart"
-        self._id = "events_per_day"
-        self._title = "Events grouped by severity per day"
-        self._tags = [
-            "events_per_day"
-        ]
-        self._periods = {
-            "last_24_hours": 1,
+
+    @property
+    def _id(self):
+        return "events_per_day"
+
+    @property
+    def _type(self):
+        return "vertical_bar_chart"
+
+    @property
+    def _tags(self):
+        return [self._id]
+
+    @property
+    def _title(self):
+        return "Events grouped by severity per day"
+
+    @property
+    def _description(self):
+        return (
+            f"{self._title} tile shows "
+            "quantity of events per day for the given period of time."
+        )
+
+    @property
+    def _short_description(self):
+        return f"{self._title} for given time period."
+
+    @property
+    def _periods(self):
+        return {
             "last_7_days": 7,
             "last_30_days": 30
         }
-        self._description = (
-            "Events grouped by severity per day chart shows "
-            "quantity of events per day for the given period of time."
-        )
-        self._short_description = ("Events grouped by severity per day "
-                                   "for given time period.")
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def type(self):
-        return self._type
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def description(self):
-        return self._description
-
-    @property
-    def short_description(self):
-        return self._short_description
-
-    @property
-    def periods(self):
-        return self._periods
 
     @staticmethod
-    def _convert_date(date):
-        return datetime.strptime(date.split("T")[0], '%Y-%m-%d')
+    def _parse_date(date):
+        return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
 
     @staticmethod
     def _keys(data):
@@ -83,8 +71,8 @@ class EventsPerDay(ITile):
         ]
 
     def _data(self, data):
-        key = list(data.keys())[0]
-        data = list(data.values())[0]
+        key = data[0]
+        data = data[1]
         return {
             "key": key,
             "values": self._values(data),
@@ -94,7 +82,7 @@ class EventsPerDay(ITile):
 
     def _date_list(self, period):
         base = datetime.today()
-        days = self.periods[period]
+        days = self._periods[period]
 
         return [
             (base - timedelta(days=x)).date() for x in range(days)
@@ -104,27 +92,24 @@ class EventsPerDay(ITile):
         date_list = self._date_list(period)
 
         return [
-            {
-                str(x): [
+            (
+                x.strftime('%m/%d'),
+                [
                     y for y in data
-                    if self._convert_date(y.UpdatedAt).date() == x
+                    if self._parse_date(y.UpdatedAt) == x
                 ]
-            }
+            )
             for x in date_list
         ]
 
     def tile_data(self, findings, period):
-        build = super(EventsPerDay, self).tile_data(period)
-
         grouped_findings = self._group_by_date(findings, period)
-        build.update(
-            {
+
+        return {
                 "keys": self._keys(findings),
                 "key_type": "string",
                 "data": [
                     self._data(data) for data in grouped_findings
-                    if list(data.values())[0]
-                ]
+                ],
+                **self.tile_extra_data(period)
             }
-        )
-        return build
