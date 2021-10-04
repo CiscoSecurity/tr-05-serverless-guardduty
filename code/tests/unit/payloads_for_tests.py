@@ -156,6 +156,23 @@ TOP_TEN_FINDINGS_TILE = {
     "type": "markdown"
 }
 
+TOTAL_EVENTS_TILE = {
+    "default_period": "last_7_days",
+    "description": "Total Events tile provides the total number of "
+                   "findings grouped by resource type.",
+    "id": "total_events",
+    "periods": ["last_24_hours",
+                "last_7_days",
+                "last_30_days",
+                "last_60_days",
+                "last_90_days"],
+    "short_description": "Total Events tile provides the total number "
+                         "of findings grouped by resource type.",
+    "tags": ["total_events"],
+    "title": "Total Events",
+    "type": "metric_group"
+}
+
 OBSERVE_RESPONSE = {
     "data": {
         "indicators": {
@@ -863,6 +880,32 @@ def tile_data_response(tile_id):
                          "Command & Control server. | 3 |"],
                 "hide_legend": False
             }
+        },
+        "total_events": {
+            "data": {
+                "cache_scope": "none",
+                "data": [
+                    {
+                        "icon": "warning",
+                        "label": "EC2 finding types",
+                        "value": 6,
+                        "value_unit": "integer"
+                    },
+                    {
+                        "icon": "warning",
+                        "label": "IAM finding types",
+                        "value": 0,
+                        "value_unit": "integer"
+                    },
+                    {
+                        "icon": "warning",
+                        "label": "S3 finding types",
+                        "value": 0,
+                        "value_unit": "integer"
+                    }
+                ],
+                "hide_legend": False
+            }
         }
     }
     data = data[tile_id]
@@ -886,7 +929,8 @@ def tiles_reponse():
         "data": [
             AFFECTED_INSTANCES_TILE,
             EVENTS_PER_DAY_TILE,
-            TOP_TEN_FINDINGS_TILE
+            TOP_TEN_FINDINGS_TILE,
+            TOTAL_EVENTS_TILE
         ]
     }
 
@@ -895,7 +939,8 @@ def tile_reponse(tile_id):
     response = {
         "affected_instances": AFFECTED_INSTANCES_TILE,
         "events_per_day": EVENTS_PER_DAY_TILE,
-        "top_ten_findings": TOP_TEN_FINDINGS_TILE
+        "top_ten_findings": TOP_TEN_FINDINGS_TILE,
+        "total_events": TOTAL_EVENTS_TILE
     }
     return {
         "data": response[tile_id]

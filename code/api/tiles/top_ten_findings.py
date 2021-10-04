@@ -1,7 +1,7 @@
 from api.tiles.factory import ITile
 
 
-class TopTenFindings(ITile):
+class TopTenFindingsTile(ITile):
     @property
     def _id(self):
         return "top_ten_findings"

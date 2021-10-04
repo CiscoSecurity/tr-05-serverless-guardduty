@@ -107,7 +107,8 @@ def success_calls():
     ids = [
         'affected_instances',
         'events_per_day',
-        'top_ten_findings'
+        'top_ten_findings',
+        'total_events'
     ]
     for tile_id in ids:
         yield SuccessCall(
@@ -137,7 +138,7 @@ def success_call(request):
 @patch('requests.get')
 @patch('api.client.GuardDuty._look_up_for_data')
 @patch('api.tiles.factory.ITile.observed_time')
-@patch('api.tiles.events_per_day.EventsPerDay._date_list')
+@patch('api.tiles.events_per_day.EventsPerDayTile._date_list')
 def test_dashboard_call_success(mock_dates, mock_time, mock_data, mock_request,
                                 success_call, client, valid_jwt):
     mock_request.return_value = \
