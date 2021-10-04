@@ -5,7 +5,7 @@ from api.mapping import SEVERITY
 from api.tiles.factory import ITile
 
 
-class EventsPerDay(ITile):
+class EventsPerDayTile(ITile):
 
     @property
     def _id(self):
