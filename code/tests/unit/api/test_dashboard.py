@@ -108,7 +108,8 @@ def success_calls():
         'affected_instances',
         'events_per_day',
         'top_ten_findings',
-        'total_events'
+        'total_events',
+        'port_probe_source_countries'
     ]
     for tile_id in ids:
         yield SuccessCall(
@@ -143,7 +144,8 @@ def test_dashboard_call_success(mock_dates, mock_time, mock_data, mock_request,
                                 success_call, client, valid_jwt):
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
-    mock_data.return_value = guard_duty_response()
+    mock_data.return_value = \
+        guard_duty_response(success_call.payload.get('tile_id'))
     mock_time.return_value = OBSERVED_TIME
     mock_dates.return_value = DATE_LIST
     response = client.post(
