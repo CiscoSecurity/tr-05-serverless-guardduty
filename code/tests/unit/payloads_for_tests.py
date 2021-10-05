@@ -1,5 +1,12 @@
 import datetime
 
+from api.tiles.affected_instances import AffectedInstancesTile
+from api.tiles.total_events import TotalEventsTile
+from api.tiles.top_ten_findings import TopTenFindingsTile
+from api.tiles.events_per_day import EventsPerDayTile
+from api.tiles.network_connection import NetworkConnectionTile
+from api.tiles.port_probe import PortProbeTile
+
 EXPECTED_RESPONSE_OF_JWKS_ENDPOINT = {
     "keys": [
         {
@@ -192,6 +199,29 @@ PORT_PROBE_COUNTRIES_TILE = {
         "port_probe_source_countries"
     ],
     "title": "Port Probe Source Countries",
+    "type": "threat_map"
+}
+
+NETWORK_CONNECTION_TILE = {
+    "default_period": "last_7_days",
+    "description": "Network Connection Source "
+                   "Countries tile visualizes the countries "
+                   "where port probes are issued from.",
+    "id": "network_connection_source_countries",
+    "periods": [
+        "last_24_hours",
+        "last_7_days",
+        "last_30_days",
+        "last_60_days",
+        "last_90_days"
+    ],
+    "short_description": "Network Connection Source "
+                         "Countries tile visualizes the countries "
+                         "where port probes are issued from.",
+    "tags": [
+        "network_connection_source_countries"
+    ],
+    "title": "Network Connection Source Countries",
     "type": "threat_map"
 }
 
@@ -512,6 +542,15 @@ DATE_LIST = [
     datetime.date(2021, 9, 23),
     datetime.date(2021, 9, 22)
 ]
+
+SUBCLASSES_ORDER = {
+    AffectedInstancesTile,
+    NetworkConnectionTile,
+    PortProbeTile,
+    TotalEventsTile,
+    TopTenFindingsTile,
+    EventsPerDayTile
+}
 
 INSTANCE_SOURCE_FINDINGS = [
     {
@@ -1336,25 +1375,27 @@ def tile_data_response(tile_id):
     return data
 
 
-def tiles_reponse():
+def tiles_response():
     return {
         "data": [
             AFFECTED_INSTANCES_TILE,
-            EVENTS_PER_DAY_TILE,
-            TOP_TEN_FINDINGS_TILE,
             TOTAL_EVENTS_TILE,
+            TOP_TEN_FINDINGS_TILE,
+            EVENTS_PER_DAY_TILE,
+            NETWORK_CONNECTION_TILE,
             PORT_PROBE_COUNTRIES_TILE
         ]
     }
 
 
-def tile_reponse(tile_id):
+def tile_response(tile_id):
     response = {
         "affected_instances": AFFECTED_INSTANCES_TILE,
         "events_per_day": EVENTS_PER_DAY_TILE,
         "top_ten_findings": TOP_TEN_FINDINGS_TILE,
         "total_events": TOTAL_EVENTS_TILE,
-        "port_probe_source_countries": PORT_PROBE_COUNTRIES_TILE
+        "port_probe_source_countries": PORT_PROBE_COUNTRIES_TILE,
+        "network_connection_source_countries": NETWORK_CONNECTION_TILE
     }
     return {
         "data": response[tile_id]

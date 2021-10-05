@@ -11,8 +11,9 @@ from tests.unit.payloads_for_tests import (
     EXPECTED_RESPONSE_OF_JWKS_ENDPOINT,
     OBSERVED_TIME,
     DATE_LIST,
-    tiles_reponse,
-    tile_reponse,
+    SUBCLASSES_ORDER,
+    tiles_response,
+    tile_response,
     tile_data_response,
     guard_duty_response
 )
@@ -120,12 +121,12 @@ def success_calls():
         yield SuccessCall(
             '/tiles/tile',
             {'tile_id': tile_id},
-            tile_reponse(tile_id)
+            tile_response(tile_id)
         )
     yield SuccessCall(
         '/tiles',
         {},
-        tiles_reponse()
+        tiles_response()
     )
 
 
@@ -140,12 +141,15 @@ def success_call(request):
 @patch('api.client.GuardDuty._look_up_for_data')
 @patch('api.tiles.factory.ITile.observed_time')
 @patch('api.tiles.events_per_day.EventsPerDayTile._date_list')
-def test_dashboard_call_success(mock_dates, mock_time, mock_data, mock_request,
+@patch('api.tiles.factory.all_subclasses')
+def test_dashboard_call_success(mock_subclasses_order, mock_dates,
+                                mock_time, mock_data, mock_request,
                                 success_call, client, valid_jwt):
     mock_request.return_value = \
         mock_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT)
     mock_data.return_value = \
         guard_duty_response(success_call.payload.get('tile_id'))
+    mock_subclasses_order.return_value = SUBCLASSES_ORDER
     mock_time.return_value = OBSERVED_TIME
     mock_dates.return_value = DATE_LIST
     response = client.post(
