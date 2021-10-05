@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from pytest import fixture
 
-from tests.unit.api.utils import get_headers
+from .utils import get_headers
 
 
 def routes():

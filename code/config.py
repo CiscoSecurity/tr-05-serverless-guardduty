@@ -10,6 +10,3 @@ class Config:
     GUARD_DUTY_REFER_URL = \
         'https://{region}.console.aws.amazon.com/detective/' \
         'home?region={region}#entities/IpAddress/{observable}'
-
-    USER_AGENT = ('SecureX Threat Response Integrations '
-                  '<tr-integrations-support@cisco.com>')
