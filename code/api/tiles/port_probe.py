@@ -1,7 +1,7 @@
 from api.tiles.factory import ITile
 
 
-class PortProbeCountriesTile(ITile):
+class PortProbeTile(ITile):
     @property
     def _id(self):
         return "port_probe_source_countries"
@@ -42,7 +42,7 @@ class PortProbeCountriesTile(ITile):
 
     def finding_criteria(self, period):
         criterion = \
-            super(PortProbeCountriesTile, self).finding_criteria(period)
+            super(PortProbeTile, self).finding_criteria(period)
         criterion["Criterion"].update(
             {
                 "service.action.actionType": {
@@ -55,10 +55,13 @@ class PortProbeCountriesTile(ITile):
         return criterion
 
     @staticmethod
-    def _data(findings):
+    def _locations(finding):
+        return finding.Service.Action.PortProbeAction.PortProbeDetails
+
+    def data(self, findings):
         data = []
         for finding in findings:
-            locations = finding.Service.Action.PortProbeAction.PortProbeDetails
+            locations = self._locations(finding)
             for location in locations:
                 details = location.RemoteIpDetails
                 point = dict(
@@ -75,6 +78,6 @@ class PortProbeCountriesTile(ITile):
 
     def tile_data(self, findings, period):
         return {
-            "data": self._data(findings),
+            "data": self.data(findings),
             **self.tile_extra_data(period)
         }
