@@ -1,4 +1,3 @@
-from marshmallow.validate import OneOf
 from marshmallow import (
     ValidationError,
     Schema,
@@ -40,32 +39,3 @@ class ActionFormParamsSchema(Schema):
 
     class Meta:
         unknown = INCLUDE
-
-
-class DashboardTileSchema(Schema):
-    tile_id = fields.String(
-        data_key='tile_id',
-        validate=validate_string,
-        required=True
-    )
-
-
-class DashboardTileDataSchema(Schema):
-    period = fields.String(
-        data_key='period',
-        validate=OneOf(
-            [
-                "last_24_hours",
-                "last_7_days",
-                "last_30_days",
-                "last_60_days",
-                "last_90_days"
-            ]
-        ),
-        required=True
-    )
-    tile_id = fields.String(
-        data_key='tile_id',
-        validate=validate_string,
-        required=True
-    )
