@@ -8,24 +8,19 @@ INVALID_TILE_ID = "Invalid tile id"
 DEFAULT_PERIOD = "last_7_days"
 
 
-def all_subclasses(cls):
-    return set(cls.__subclasses__())\
-        .union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
-
-
 class TileFactory:
 
     @staticmethod
     def get_tile(tile_id):
 
-        for cls in all_subclasses(ITile):
+        for cls in ITile.__subclasses__():
             if cls()._id == tile_id:
                 return cls()
         raise TRFormattedError(400, INVALID_TILE_ID)
 
     @staticmethod
     def list_tiles():
-        return [cls().tile() for cls in all_subclasses(ITile)]
+        return [cls().tile() for cls in ITile.__subclasses__()]
 
 
 class ITile(metaclass=ABCMeta):
