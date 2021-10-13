@@ -22,8 +22,8 @@ class PortProbeTile(ITile):
     def _description(self):
         return (
             f"{self._title} tile visualizes "
-            f"the countries where port probes "
-            f"are issued from."
+            "the countries where port probes "
+            "are issued from."
         )
 
     @property
