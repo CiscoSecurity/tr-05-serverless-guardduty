@@ -1,9 +1,11 @@
 from functools import partial
+
 from flask import Blueprint, g
-from mappings.mapping import Mapping
+
+from api.mapping import Mapping
 from api.observables import Observable
 from api.schemas import ObservableSchema
-from aws_drivers.aws_guard_duty_driver import GuardDutyDriver
+from api.client import GuardDuty
 from api.utils import (
     get_json,
     get_jwt,
@@ -20,7 +22,7 @@ get_observables = partial(get_json, schema=ObservableSchema(many=True))
 @enrich_api.route('/observe/observables', methods=['POST'])
 def observe_observables():
     _ = get_jwt()
-    guard_duty = GuardDutyDriver()
+    client = GuardDuty()
     observables = remove_duplicates(get_observables())
 
     g.sightings = []
@@ -35,9 +37,9 @@ def observe_observables():
         criteria = target.query(value)
 
         for criterion in criteria:
-            guard_duty.findings.list_by(criterion)
+            client.search(criterion)
 
-        findings = guard_duty.findings.get()
+        findings = client.findings
         for finding in findings:
             mapping = Mapping(finding, **observable)
             with mapping.set_session():
@@ -52,7 +54,7 @@ def observe_observables():
                         sighting, indicator, 'sighting-of'
                     )
                     g.relationships.append(relationship.json)
-                except KeyError:
+                except AttributeError:
                     continue
 
     return jsonify_result()
