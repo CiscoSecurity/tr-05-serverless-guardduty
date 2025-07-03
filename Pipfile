@@ -9,7 +9,7 @@ Flask = "==3.0.3"
 marshmallow = "==3.22.0"
 PyJWT = "==2.6.0"
 requests = "==2.32.4"
-boto3= "==1.17.52"
+boto3= "== 1.39.2"
 bundlebuilder = {git = "https://github.com/CiscoSecurity/tr-05-ctim-bundle-builder.git", ref = "develop"}
 
 [dev-packages]
